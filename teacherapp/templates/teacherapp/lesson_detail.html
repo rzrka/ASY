@@ -1,0 +1,101 @@
+{% extends 'teacherapp/lesson_detail_main.html' %}
+
+{% block attendance_block %}
+
+    <div class="row_div flex_div">
+        
+        <div class="list-div list schedule_lessonsList_Listdiv schedule_teacherPage_Listdiv attendanceDiv">
+
+            <div class="list-item list-title">Посещаемость студентов</div>
+
+            <div href="#" class="list-item subtitle cursor-normal">
+
+                <span>
+
+                    №
+
+                </span>
+
+                <span>
+
+                    Студенты группы 
+
+                </span>
+
+                <span>
+
+                    Посещаемость
+
+                </span>
+
+            </div>
+
+            <div class="list-item-content">
+
+                {% for grade in grades %}
+
+                    <div class="list-item cursor-normal">
+
+                        <span>
+                            
+                            {{grade.instance.student.version_in_group}}
+
+                        </span>
+
+                        <span>
+                            
+                            <a href="{{grade.instance.get_absolute_url}}" class="simple-link">{{grade.instance.student.student.get_full_name}}</a>
+
+                        </span>
+
+                        <span>
+
+                            {% for choise in grade.visible_fields.0|slice:":2" %}
+
+                                <label class="btn sircle_btn btn_secondary btn_toggle little_button" data-class="{{choise.choice_label}}" for="{{ choise.id_for_label  }}">
+                                
+                                    {{ choise.tag }}
+
+                                    {{ choise.choice_label }}
+
+                                </label>
+                            
+                            {% endfor %}
+
+                            <label class="btn sircle_btn btn_secondary btn_toggle btn-hidden" data-class="{{grade.visible_fields.0.2.choice_label}}" for="{{ grade.visible_fields.0.2.id_for_label }}">
+                                
+                                    {{ grade.visible_fields.0.2.tag }}
+
+                                    {{ grade.visible_fields.0.2.choice_label }}
+
+                                </label>
+
+                            <label class="btn sircle_btn btn_secondary btn_toggle btn-hidden" data-class="{{grade.visible_fields.0.3.choice_label}}" for="{{ grade.visible_fields.0.3.id_for_label }}">
+                                
+                                {{ grade.visible_fields.0.3.tag }}
+
+                                {{ grade.visible_fields.0.3.choice_label }}
+
+                            </label>
+
+                        </span>
+
+                    </div>
+                
+                {% empty %}
+
+                    <div class="list-item">
+
+                        Список студентов пуст!
+
+                    </div>
+                
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+{% endblock attendance_block %}

@@ -1,0 +1,123 @@
+{% extends 'teacherapp/general_criterion_list.html' %}
+
+{% load static %}
+
+{% load django_bootstrap_breadcrumbs %}
+
+{% load teacherapp_extras %}
+
+{% block breadcrumbs %}
+
+	{{ block.super }}
+
+	{% breadcrumb criterion.criterion_number 'teacherapp_control_type_general_criterion_detail_url' schedule.id control_type.id criterion.id %}
+
+{% endblock %}
+
+{% block content %}
+
+	<div class="row_div">
+
+		<div class="document_title">
+			
+			<h3>
+				
+				Информация о критерии:
+
+			</h3>
+
+		</div>
+
+	</div>
+
+    {% include 'teacherapp/includes/form-messages_errors.html' %}
+
+    <form action="{% url 'teacherapp_control_type_general_criterion_detail_url' schedule.id control_type.id criterion.id %}" method="post">
+
+		{% include 'teacherapp/includes/form-table.html' %}
+
+		<div class="row_div flex_div flex_div_vertical">
+			
+			<div class="flex_div flex_horizontal_align">
+
+                <button type="submit" class="btn sircle_btn little_button">
+                
+                    Сохранить данные
+                
+                </button>
+
+                <a data-iframe="delete_iframe" class="btn sircle_btn btn_secondary btn_delete little_button">
+                    
+                    Удалить критерий
+
+                </a>
+
+            </div>
+
+		</div>
+
+	</form>
+
+    <div id="delete_iframe" class="iframe iframe-delete display_none">
+
+        <form class="form_delete" action="{% url 'teacherapp_control_type_general_criterion_delete_url' schedule.id control_type.id criterion.id %}" method="post">
+
+            {% csrf_token %}
+
+            <div class="delete_title">
+                    
+                <h4>
+                    
+                    Вы уверены что хотите удалить критерий "{{criterion.name}}"?
+
+                </h4>
+
+            </div>
+            
+            <div class="iframe-row">
+
+                <button type="submit" class="btn btn_delete btn_delete_primary little_button">Удалить</button>
+
+            </div>
+            
+            <div class="iframe-row">
+                
+                <a class="btn btn_secondary little_button btn_cancel iframe-element-close">Не удалять</a>
+
+            </div>
+
+        </form>
+
+        <button class="iframe-btn-close ifame-close iframe-element-close"></button>
+
+    </div>
+
+{% endblock content %}
+
+{% block javascript %}
+
+    <!-- Import script close message -->
+
+	<script type="text/javascript" src="{% static 'js/close_message.js' %}"></script>
+
+	<!-- Import script scale calculate -->
+
+	<script type="text/javascript" src="{% static 'teacherapp/js/control_type_scale_calculate.js' %}"></script>
+
+	<!-- Import calculate scripts -->
+
+	<script type="text/javascript" src="{% static 'teacherapp/js/weight_detail_calculate.js' %}"></script>
+
+	<script type="text/javascript">
+		var weight = document.getElementsByClassName("weight")[0];
+		calculateRationing({{all_weights.weight__sum}});
+		weight.oninput = function() {
+		     calculateRationing({{all_weights.weight__sum}});
+		};
+	</script>
+
+    <!-- Import script model window -->
+
+	<script type="text/javascript" src="{% static 'js/model.js' %}"></script>
+
+{% endblock javascript %}

@@ -1,0 +1,11 @@
+.pass_div {
+    width: 50%;
+    border-bottom: 1px solid var(--header-color);
+    padding-bottom: 1px;
+}
+
+.pass_div span {
+    border-radius: 3px;
+    color: var(--header-color);
+    float: right;
+}

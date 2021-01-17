@@ -1,0 +1,475 @@
+{% extends 'studentapp/job_history_list.html' %}
+
+{% load static %}
+
+{% load django_bootstrap_breadcrumbs %}
+
+{% load teacherapp_extras %}
+
+{% block style %}
+
+    <!-- Import model styles -->
+
+	<link rel="stylesheet" type="text/css" href="{% static 'css/model.css' %}">
+
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+{% endblock style %}
+
+{% block breadcrumbs %}
+
+	{{ block.super }}
+
+    {% breadcrumb history_verification.check_date|date:"d.m.Y, H:i" 'student_job_history_detail_url' semester.id discipline.id job.id history_verification.id %}
+
+{% endblock %}
+
+{% block content %}
+
+    <div class="row_div">
+        
+        <table class="input_table">
+
+            <tbody>
+
+                <tr>
+
+                    <th>Работа (дисциплина)</th>
+
+                    <td>
+
+                        <b>{{history_verification.control_grade.controlwork.control_type}} №{{history_verification.control_grade.controlwork.work_number}}
+
+                        "{{history_verification.control_grade.controlwork.name}}"</b>
+
+                        ({{history_verification.control_grade.controlwork.control_type.schedule.discipline}})
+                    
+                    </td>
+
+                </tr>
+
+                <tr>
+
+                    <th>Статус</th>
+
+                    <td>
+
+                        {% with history_verification.control_grade as grade %}
+
+                            <span>
+
+                                {{grade.status|get_tuple}}
+
+                                {% if grade.status|get_tuple == grade.STATUS_VARIANTS.1.0 %}
+                                
+                                    ({{grade.tele_works.all.count}})
+                                
+                                {% endif %}
+
+                            </span>
+                        
+                        {% endwith %}
+                
+                    </td>
+
+                </tr>
+            
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <div class="row_div pass_div">
+
+        <b>Проверка от {{history_verification.check_date|date:"d.m.Y, H:i"}}</b>
+
+        (
+            
+        степень выполнения работы:
+
+        <span data-category="{% if history_verification.control_grade.controlwork.scale.dimension == 2 %}{{history_verification|grade_attendance_offset_grade}}{% elif history_verification.control_grade.controlwork.scale.dimension == 5 %}{{history_verification.grade}}{% else %}{{history_verification|get_normal_grade_verification}}{% endif %}">
+
+            {% if history_verification.control_grade.controlwork.scale.dimension == 2 %}
+
+                {% if history_verification.grade == 2 %}
+                
+                    Зачет
+
+                {% else %}
+                
+                    Незачет
+
+                {% endif %}
+
+            {% else %}
+
+                {{history_verification.grade}}{% if history_verification.control_grade.controlwork.scale.dimension == 100 %}%{% else %}/{{history_verification.control_grade.controlwork.scale.dimension}}{% endif %}
+
+            {% endif %}
+
+        </span>
+
+        ):
+
+    </div>
+
+    <div class="row_div pass_div verification_div">
+
+        <b>Файл работы: </b>
+
+        {% with history_verification.files as file %}
+
+            <a class="save_link" href="{% url 'mainapp_download_file_url' file.file.path %}" download>
+                
+                {% with file|get_expansion as file_expansion %}
+                    
+                    <img class="comment_image" src="{% static 'img/'|add:file_expansion|add:'.png' %}">
+                
+                {% endwith %}
+
+                <div class="comment_postimage_text">
+
+                    {{file}}
+
+                </div>
+                
+            </a>
+        
+        {% endwith %}
+
+    </div>
+
+    {% include 'teacherapp/includes/form-messages_errors.html' %}
+
+    <div class="row_div flex_div flex_div_vertical">
+
+        <div class="list-div list schedule_teacherPage_Listdiv work_werification_listDiv">
+
+            <div href="#" class="list-item subtitle cursor-normal">
+
+                <span>
+
+                    Критерий
+
+                </span>
+
+                <span>
+
+                    Оценка 
+
+                </span>
+
+                <span>
+
+                    Замечание/примечание
+
+                </span>
+
+            </div>
+
+            <div class="list-item-content">
+
+                {% for verification_criterion in history_verification|general_criterions %}
+                
+                    {% with verification_criterion as include_criterion %}
+                    
+                        <div data-criterion="{{include_criterion.id}}" class="list-item calculate-list-subitem href-block-relative cursor-normal">
+
+                            <span>
+
+                                {{include_criterion.criterion.criterion_number}}.
+                                
+                                {{include_criterion.criterion.name}}
+
+                            </span>
+
+                            {% with criterionsgrades|get_item:include_criterion.id as criterion %}
+                            
+                                <span class="weight" data-weight="{{include_criterion.criterion.weight}}" data-scale="{{include_criterion.criterion.scale.dimension}}" {% if is_subcriterion %}data-general_criterion="{{is_subcriterion.id}}"{% endif %}>
+
+                                    {% if include_criterion.criterion.scale.dimension == 2 %}
+                                    
+                                        {% for choise in criterion.visible_fields.0 %}
+
+                                            <label class="btn sircle_btn btn_secondary btn_toggle little_button" data-class="{{choise.choice_label}}" for="{{ choise.id_for_label  }}">
+                                            
+                                                {{ choise.tag }}
+
+                                                {{ choise.choice_label }}
+
+                                            </label>
+                                        
+                                        {% endfor %}
+                                    
+                                    {% else %}
+                                    
+                                        {% for field in criterion %}
+                                    
+                                            {{field}}
+                                        
+                                        {% endfor %}
+                                    
+                                    {% endif %}
+                                
+                                </span>
+                            
+                            {% endwith %}
+
+                            <span>
+
+                                {% for comment in include_criterion.tele_work_criterion_comment.all %}
+                    
+                                    <div class="colored_text_comment comment" data-grade="2">{{comment}}</div>
+                                
+                                {% empty %}
+                                            
+                                    <div class="colored_text_comment comment" data-grade="5">Нет замечаний</div>
+
+                                {% endfor %}
+
+                                {% include 'studentapp/includes/history_job_criterion_self_comment.html' %}
+
+                            </span>
+
+                        </div>
+                    
+                    {% endwith %}
+
+                    <div class="subcriterions">
+                    
+                        {% for verification_subcriterion in verification_criterion|subcriterions:history_verification %}
+                    
+                            {% with verification_subcriterion as include_criterion %}
+
+                                {% with verification_criterion as is_subcriterion %}
+                                
+                                    <div data-criterion="{{include_criterion.id}}" class="list-item calculate-list-subitem href-block-relative cursor-normal">
+
+                                        <span>
+
+                                            {{is_subcriterion.criterion.criterion_number}}.{{include_criterion.criterion.criterion_number}}.
+                                            
+                                            {{include_criterion.criterion.name}}
+
+                                        </span>
+
+                                        {% with criterionsgrades|get_item:include_criterion.id as criterion %}
+                                        
+                                            <span class="weight" data-weight="{{include_criterion.criterion.weight}}" data-scale="{{include_criterion.criterion.scale.dimension}}" {% if is_subcriterion %}data-general_criterion="{{is_subcriterion.id}}"{% endif %}>
+
+                                                {% if include_criterion.criterion.scale.dimension == 2 %}
+                                                
+                                                    {% for choise in criterion.visible_fields.0 %}
+
+                                                        {% if choise.tag|get_value %}
+                                                        
+                                                            <label class="btn sircle_btn btn_secondary btn_toggle little_button" data-class="{{choise.choice_label}}" for="{{ choise.id_for_label }}">
+                                                        
+                                                                {{ choise.tag }}
+
+                                                                {{ choise.choice_label }}
+
+                                                            </label>
+                                                        
+                                                        {% else %}
+
+                                                            <label class="btn sircle_btn btn_secondary btn_toggle little_button btn-hidden" data-class="{{choise.choice_label}}" for="{{ choise.id_for_label }}">
+                                                        
+                                                                {{ choise.tag }}
+
+                                                                {{ choise.choice_label }}
+
+                                                            </label>
+
+                                                        {% endif %}
+
+                                                    {% endfor %}
+                                                
+                                                {% else %}
+                                                
+                                                    {% for field in criterion %}
+                                                
+                                                        {{field}}
+                                                    
+                                                    {% endfor %}
+                                                
+                                                {% endif %}
+                                            
+                                            </span>
+                                        
+                                        {% endwith %}
+
+                                        <span>
+
+                                            {% for comment in include_criterion.tele_work_criterion_comment.all %}
+                                
+                                                <div class="colored_text_comment comment" data-grade="2">{{comment}}</div>
+                                            
+                                            {% empty %}
+                                                        
+                                                <div class="colored_text_comment comment" data-grade="5">Нет замечаний</div>
+
+                                            {% endfor %}
+
+                                            {% include 'studentapp/includes/history_job_criterion_self_comment.html' %}
+
+                                        </span>
+
+                                    </div>
+                                
+                                {% endwith %}
+                            
+                            {% endwith %}
+                        
+                        {% endfor %}
+                    
+                    </div>
+                    
+                {% endfor %}
+
+            </div>
+        
+        </div>
+
+    </div>
+
+    <div class="row_div pass_div1 comment_block">
+
+        <div>
+
+            <b>
+        
+                Дополнительные замечания преподавателя:
+
+            </b>
+        
+        </div>
+
+        <span class="additional_comment">{% if history_verification.additional_comment %}{{history_verification.additional_comment}}{% else %}Комментария нет!{% endif %}</span>
+
+    </div>
+    
+    <form method="post" action="{% url 'student_job_history_detail_url' semester.id discipline.id job.id history_verification.id %}">
+
+        {% csrf_token %}
+
+        <div class="row_div pass_div1">
+
+            <div>
+
+                <b>
+            
+                    Дополнительные примечания студента:
+
+                </b>
+            
+            </div>
+
+            {{grade_form.visible_fields.0}}
+
+        </div>
+
+        <div class="row_div flex_div flex_div_vertical">
+
+            <button type="submit" name="comment_submit" class="btn sircle_btn little_button">Отправить дополнительное примечание</button>
+
+        </div>
+
+    </form>
+
+    
+
+    <div id="add_comment" class="iframe iframe-add_comment display_none">
+
+        <div class="delete_title">
+                
+            <h4>
+                
+                Примечание
+
+            </h4>
+
+        </div>
+
+        <div class="iframe-row">
+
+            {% for hidden in iframe_form.hidden_fields %}
+                {{ hidden }}
+            {% endfor %}
+
+            <table class="input_table">
+
+                <tbody>
+
+                    {% for field in iframe_form.visible_fields %}
+
+                        <tr>
+
+                            <th><label>{{field.label}}</label></th>
+
+                            <td>{{field}}</td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+        
+        <div class="iframe-row">
+
+            <button id="save_comment" class="btn little_button">Сохранить примечание</button>
+
+        </div>
+
+        <button class="iframe-btn-close ifame-close iframe-element-close"></button>
+
+    </div>
+
+{% endblock content %}
+
+{% block javascript %}
+
+    <!-- Import script toggle button -->
+
+	<script type="text/javascript" src="{% static 'js/multiple_file.js' %}"></script>
+
+	<!-- Import table scripts -->
+
+	<script type="text/javascript" src="{% static 'js/show_href_blocks.js' %}"></script>
+
+    <!-- Import script close message -->
+
+	<script type="text/javascript" src="{% static 'js/close_message.js' %}"></script>
+
+    <!-- Import script add comment verification.js -->
+
+	<script type="text/javascript">
+        var url_addres = "{% url 'student_job_history_add_comment_url' semester.id discipline.id job.id history_verification.id  %}";
+        var url_delete_addres = "{% url 'student_job_history_delete_comment_url' semester.id discipline.id job.id history_verification.id  %}";
+        var job_scale = "{{job.scale.dimension}}";
+        var function_toggle = null;
+        var general_classes = null;
+    </script>
+
+    <!-- Import script toggle button -->
+
+	<script type="text/javascript" src="{% static 'js/toggle_button.js' %}"></script>
+
+    <!-- Import color input script -->
+
+	<script type="text/javascript" src="{% static 'js/color_numberinputs.js' %}"></script>
+
+    <!-- Import script add comment verification.js -->
+
+	<script type="text/javascript" src="{% static 'studentapp/js/add_comment_verification.js' %}"></script>
+
+    <!-- Import script model window -->
+
+	<script type="text/javascript" src="{% static 'js/model.js' %}"></script>
+
+{% endblock javascript %}

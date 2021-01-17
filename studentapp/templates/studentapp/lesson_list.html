@@ -1,0 +1,55 @@
+{% extends 'studentapp/schedule_detail.html' %}
+
+{% load static %}
+
+{% load django_bootstrap_breadcrumbs %}
+
+{% load teacherapp_extras %}
+
+{% block style %}
+
+	<link rel="stylesheet" type="text/css" href="{% static 'css/beautiful_grade.css' %}">
+
+{% endblock style %}
+
+{% block breadcrumbs %}
+
+	{{ block.super }}
+
+    {% breadcrumb "Занятия" 'student_lesson_list_url' semester.id discipline.id %}
+
+{% endblock %}
+
+{% block content %}
+
+    {% include 'studentapp/includes/lesson_list_include.html' %}
+
+	<div class="row_div pass_div">
+
+		Пропусков (без уважительной причины): <span data-category="{{skips.1}}">{{skips.0}}</span>
+
+	</div>
+
+	<div class="row_div pass_div">
+
+		Пропусков (всего): <span data-category="{{normal_skips.1}}">{{normal_skips.0}}</span>
+
+	</div>
+
+{% endblock content %}
+
+{% block javascript %}
+
+    <!-- Import script close message -->
+
+	<script type="text/javascript" src="{% static 'js/close_message.js' %}"></script>
+
+	<!-- Import table scripts -->
+
+	<script type="text/javascript" src="{% static 'teacherapp/js/control_work_wight_calculate.js' %}"></script>
+
+	<!-- Import table scripts -->
+
+	<script type="text/javascript" src="{% static 'js/show_href_blocks.js' %}"></script>
+
+{% endblock javascript %}

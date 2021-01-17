@@ -1,0 +1,71 @@
+{% if messages %}
+
+    <div class="row_div success_div">
+
+        {% for message in messages %}
+
+            <div class="success">
+            
+                {{ message }}
+
+                <span class="closebtn">&times;</span>
+
+            </div>
+            
+        {% endfor %}
+
+    </div>
+
+{% endif %}
+
+{% if form.errors %}
+
+    <div class="row_div errors_div">
+
+        {% for field in form %}
+
+            {% for error in field.errors %}
+
+                <div class="error">
+                
+                    (поле "{{field.label}}") {{error}}
+
+                    <span class="closebtn">&times;</span>
+
+                </div>
+            
+            {% endfor %}
+        
+        {% endfor %}
+
+    </div>
+
+{% endif %}
+
+{% for form in subforms %}
+
+    {% if form.errors %}
+    
+        <div class="row_div errors_div">
+
+            {% for field in form %}
+
+                {% for error in field.errors %}
+
+                    <div class="error">
+                    
+                        (поле "{{field.label}}") {{error}}
+
+                        <span class="closebtn">&times;</span>
+
+                    </div>
+                
+                {% endfor %}
+            
+            {% endfor %}
+
+        </div>
+    
+    {% endif %}
+
+{% endfor %}

@@ -1,0 +1,125 @@
+{% extends 'teacherapp/write_job_detail.html' %}
+
+{% load static %}
+
+{% load django_bootstrap_breadcrumbs %}
+
+{% block breadcrumbs %}
+
+	{{ block.super }}
+    
+    {% breadcrumb "Оценки" 'teacherapp_job_write_survey_url'  %}
+
+{% endblock %}
+
+{% block style %}
+
+    <!-- Import styles for slider -->
+
+	<link rel="stylesheet" type="text/css" href="{% static 'css/slider.css' %}">
+
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+{% endblock style %}
+
+{% block content %}
+
+    <form method="post" action="{% url 'teacherapp_job_write_url' schedule.id control_type.id job.id %}">
+
+        {% csrf_token %}
+
+        <div class="slider_container">
+                
+            <div class="slider">
+
+                <div class="slider__wrapper">
+
+                    <div class="slider__items">
+
+                        {% for grade in grades %}
+
+                            <div class="slider__item list weight" data-class="" data-scale="{{grade.instance.controlwork.scale.dimension}}" {% ifequal grade grades|first %}active{% endifequal %}>
+
+                                <h5 class="list-item list-title">{{grade.instance.student.version_in_group}}. {{grade.instance.student.student.get_full_name}}</h5>
+
+                                {% if is_radio %}
+                        
+                                    {% for choise in grade.visible_fields.0 %}
+
+                                        <label class="btn sircle_btn btn_secondary btn_toggle" data-class="{{choise.choice_label}}" for="{{ choise.id_for_label  }}">
+                                        
+                                            {{ choise.tag }}
+
+                                            {{ choise.choice_label }}
+
+                                        </label>
+
+                                    {% endfor %}
+                        
+                                {% else %}
+
+                                    {% for choise in grade.visible_fields.0 %}
+
+                                        {{choise}}
+
+                                    {% endfor %}
+                                
+                                {% endif %}
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+                <a class="slider__control slider__control_prev" href="#" role="button"></a>
+
+                <a class="slider__control slider__control_next slider__control_show" href="#" role="button"></a>
+
+            </div>
+
+        </div>
+
+        <div class="row_div flex_div flex_div_vertical">
+            
+            <button type="submit" class="btn sircle_btn little_button">Сохранить данные</button>
+
+        </div>
+
+    </form>
+
+{% endblock content %}
+
+{% block javascript %}
+
+    <script type="text/javascript">
+        var general_classes = null;
+    </script>
+
+    <!-- Import script toggle button -->
+
+	<script type="text/javascript" src="{% static 'js/toggle_button.js' %}"></script>
+
+    <!-- Import script slider -->
+
+	<script type="text/javascript" src="{% static 'js/slider.js' %}"></script>
+
+    <!-- Import color input script -->
+
+	<script type="text/javascript" src="{% static 'js/color_numberinputs.js' %}"></script>
+
+    <script type="text/javascript">
+        (function() {
+            $('.weight').each(function(index, element) {
+                var weight = $(this);
+                $(this).find('input, select').on('change', function() {
+                    set_numberimputs_color(); // цвета inputов[type=number]
+                });
+            });
+            set_numberimputs_color();
+        })();
+    </script>
+
+{% endblock javascript %}

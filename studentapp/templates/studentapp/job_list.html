@@ -1,0 +1,45 @@
+{% extends 'studentapp/schedule_detail.html' %}
+
+{% load static %}
+
+{% load django_bootstrap_breadcrumbs %}
+
+{% load teacherapp_extras %}
+
+{% block style %}
+
+	<link rel="stylesheet" type="text/css" href="{% static 'css/beautiful_grade.css' %}">
+
+	<link rel="stylesheet" type="text/css" href="{% static 'css/svg_schedule.css' %}">
+
+{% endblock style %}
+
+{% block breadcrumbs %}
+
+	{{ block.super }}
+
+    {% breadcrumb 'Работы' 'student_job_list_url' semester.id discipline.id %}
+
+{% endblock %}
+
+{% block content %}
+
+    {% include 'studentapp/includes/job_list_include.html' %}
+
+{% endblock content %}
+
+{% block javascript %}
+
+    <!-- Import script close message -->
+
+	<script type="text/javascript" src="{% static 'js/close_message.js' %}"></script>
+
+	<!-- Import table scripts -->
+
+	<script type="text/javascript" src="{% static 'teacherapp/js/control_work_wight_calculate.js' %}"></script>
+
+	<!-- Import table scripts -->
+
+	<script type="text/javascript" src="{% static 'js/show_href_blocks.js' %}"></script>
+
+{% endblock javascript %}

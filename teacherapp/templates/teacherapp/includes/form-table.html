@@ -1,0 +1,51 @@
+{% csrf_token %}
+
+{% for hidden in form.hidden_fields %}
+    {{ hidden }}
+{% endfor %}
+ {% for subform in subforms %}
+    {% for hidden in subform.hidden_fields %}
+        {{ hidden }}
+    {% endfor %}
+{% endfor %}
+
+<div class="row_div">
+
+    <table class="input_table">
+
+        <tbody>
+
+            {% for field in form.visible_fields %}
+
+                <tr>
+
+                    <th><label>{{field.label}}</label></th>
+
+                    <td>{{field}}</td>
+
+                </tr>
+
+            {% endfor %}
+
+            {% for subform in subforms %}
+
+                {% for field in subform.visible_fields %}
+
+                    <tr>
+
+                        <th><label>{{field.label}}</label></th>
+
+                        <td>{{field}}</td>
+
+                    </tr>
+                
+                {% endfor %}
+
+            {% endfor %}
+
+        </tbody>
+
+
+    </table>
+
+</div>

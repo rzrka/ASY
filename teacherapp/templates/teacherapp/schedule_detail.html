@@ -1,0 +1,386 @@
+{% extends 'teacherapp/schedule_list.html' %}
+
+{% load static %}
+
+{% load django_bootstrap_breadcrumbs %}
+
+{% load teacherapp_extras %}
+
+{% block style %}
+
+	<link rel="stylesheet" type="text/css" href="{% static 'css/svg_schedule.css' %}">
+
+	<link rel="stylesheet" type="text/css" href="{% static 'css/table_button.css' %}">
+
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+	<script type="text/javascript" src="{% static 'js/jquery.table2excel.js' %}"></script>
+
+{% endblock style %}
+
+{% block breadcrumbs %}
+
+	{{ block.super }}
+
+	{% breadcrumb schedule schedule.get_absolute_url %}
+
+{% endblock %}
+
+{% block content %}
+
+	<div class="row_div">
+
+		<div class="document_title">
+
+			<h3>
+
+				Посещаемость студентов
+
+			</h3>
+
+			<a class="btn sircle_btn btn_secondary float-right little_button" href="{% url 'teacherapp_schedule_lessonsList_url' schedule.id %}">
+
+				Перечень занятий
+
+			</a>
+
+		</div>
+
+	</div>
+
+	</div>
+
+	{% include 'teacherapp/includes/form-messages_errors.html' %}
+
+	<div class="row_div table_div flex_div">
+
+		<table class="table-hover table-striped table-bordered flex-table" data-table_name="Посещаемость студентов">
+
+			<thead>
+
+				<tr>
+
+					<th scope="col" width="80">№</th>
+
+					<th scope="col">Студенты</th>
+
+					{% for auditoryLesson in schedule.auditoryLessons.all|dictsort:"lessons_number" %}
+					
+						<th scope="col">
+						
+							<a href="{{auditoryLesson.get_absolute_url}}">
+							
+								{{auditoryLesson.date|date:"d.m.Y"}}
+								
+							</a>
+						
+						</th>
+
+					{% endfor %}
+
+					<th scope="col">Пропусков (без ув.пр.)</th>
+
+					<th scope="col">Пропусков (всего)</th>
+
+				</tr>
+
+			</thead>
+
+			<tbody>
+
+				{% for element in attendance_elements %}
+
+					<tr>
+
+						<th>{{element.user.students.version_in_group}}</th>
+
+						<td>{{element.user.get_full_name}}</td>
+
+						{% for grade in element.grades %}
+						
+							<td>
+							
+								<a href="{% url 'teacherapp_lesson_student_attendance_detail_url' schedule.id grade.auditorylessons.id grade.id %}" 
+								data-category="{{grade}}">
+								
+									{{grade}}
+
+									{% with grade|unread_comments:user as comments %}
+
+										{% if comments %}(+{{comments|length}}){% endif %}
+									
+									{% endwith %}
+									
+								</a>
+							
+							</td>
+						
+						{% endfor %}
+
+						<th>
+
+							<div data-category="{{element.skips.1}}">
+
+								{{element.skips.0}}
+
+							</div>
+						
+						</th>
+
+						<th>
+
+							<div data-category="{{element.normal_skips.1}}">
+
+								{{element.normal_skips.0}}
+
+							</div>
+						
+						</th>
+
+					</tr>
+				
+				{% empty %}
+
+					<tr>
+
+						<td colspan="5">Список студентов пуст!</td>
+
+					</tr>
+					
+				{% endfor %}
+
+			</tbody>
+
+		</table>
+
+	</div>
+
+	<div class="row_div">
+
+		<div class="document_title">
+			
+			<h3>
+				
+				Успеваемость студентов
+
+			</h3>
+
+			<a href="{% url 'teacherapp_control_type_list_url' schedule.id %}" class="btn sircle_btn btn_secondary float-right little_button">
+				
+				Перечень видов контроля
+				
+			</a>
+
+		</div>
+
+	</div>
+
+	<div class="row_div table_div flex_div">
+
+		<table class="table-hover table-striped table-bordered flex-table grades_table" data-table_name="Успеваемость студентов">
+
+			{% with schedule.control_types.all|dictsort:'name' as control_types %}
+
+				<thead>
+					
+						<tr>
+
+							<th scope="col" width="80" rowspan="2">№</th>
+
+							<th scope="col" rowspan="2">Студенты</th>
+
+							{% for control_type in control_types %}
+
+								{% if control_type.control_works.all.count != 0  %}
+
+									<th scope="col" colspan="{{control_type.control_works.all.count}}">
+									
+										{{control_type.name}}
+									
+									</th>
+								
+								{% endif %}
+							
+							{% endfor %}
+
+						</tr>
+
+						<tr>
+
+							{% for control_type in control_types %}
+
+								{% for control_job in control_type.control_works.all|dictsort:'work_number' %}
+								
+									<th scope="col">
+								
+										<a href="{% url 'teacherapp_job_write_url' schedule.id control_type.id control_job.id %}">
+										
+											№{{control_job.work_number}}
+										
+										</a>
+									
+									</th>
+								
+								{% endfor %}
+
+							{% endfor %}
+
+						</tr>
+
+				</thead>
+
+				<tbody>
+
+					{% for student in schedule.studentgroup.students.all|dictsort:"version_in_group"  %}
+						
+						<tr>
+
+							<th>{{student.version_in_group}}</th>
+
+							<td>{{student.student.get_full_name}}</td>
+
+							{% with jobs_elements|get_item:student.id as grades %}
+
+								{% for control_type in control_types %}
+
+									{% for control_job in control_type.control_works.all|dictsort:'work_number' %}
+
+										{% with grades|get_grade_from_query:control_job as grade %}
+
+											<td>
+
+												{% if grade.controlwork.scale.dimension == 5 %}
+
+													<div class="svg_hourglass_relative" data-category="{{grade}}">
+													
+														{{grade}}
+												
+												{% elif grade.controlwork.scale.dimension == 2 %}
+
+													<div class="svg_hourglass_relative" data-category="{{grade|grade_attendance_offset_grade}}">
+
+														{{grade|grade_attendance_offset}}
+												
+												{% else %}
+
+													<div class="half_span_relative svg_hourglass_relative" data-category="{{grade|get_normal_grade}}">
+
+														<span class="half_span">
+
+															{{grade}}
+														
+																{% if grade.controlwork.scale.dimension == 100 %}
+															
+																%
+																	
+															{% else %}
+														
+																/ 
+															
+																{{grade.controlwork.scale.dimension}}
+														
+															{% endif %}  
+
+														</span>
+
+														<span class="half_span">
+
+															{{grade|get_normal_grade}}
+
+														</span>
+
+												{% endif %}
+
+												{% with grade|unchecked_works as works %}
+												
+													{% if works %}
+												
+														<img
+															class="svg_hourglass"
+															src="{% static 'svg/hourglass_empty-black-18dp.svg' %}"
+															alt="hourglass">
+													
+													{% endif %}
+												
+												{% endwith %}
+
+												</div>
+
+											</td>
+
+										{% endwith %}
+
+									{% endfor %}
+
+								{% endfor %}
+
+							{% endwith %}
+
+						</tr>
+					
+					{% empty %}
+					
+						<td colspan="2">Список студентов пуст!</td>
+					
+					{% endfor %}
+
+				</tbody>
+
+			{% endwith %}
+
+		</table>
+
+	</div>
+
+	<div class="row_div flex_div flex_div_vertical">
+		
+		<a class="btn sircle_btn btn_secondary little_button" href="{% url 'teacherapp_schedule_lessonsList_url' schedule.id %}">
+		
+			Перечень занятий
+		
+		</a>
+
+		<a class="btn sircle_btn little_button" href="{% url 'teacherapp_lesson_create_url' schedule.id %}">Добавить новое занятие</a>
+
+		<a href="{% url 'teacherapp_control_type_list_url' schedule.id %}" class="btn sircle_btn btn_secondary little_button">
+		
+			Перечень видов контроля
+		
+		</a>
+
+		<a href="{% url 'teacherapp_control_type_create_url' schedule.id %}" class="btn sircle_btn little_button">
+		
+			Добавить новый вид контроля
+		
+		</a>
+
+	</div>
+
+{% endblock content %}
+
+{% block javascript %}
+
+	<!-- Import table scripts -->
+
+	<script type="text/javascript" src="{% static 'js/big_table.js' %}"></script>
+
+	<!-- Import script close message -->
+
+	<script type="text/javascript" src="{% static 'js/close_message.js' %}"></script>
+
+	<!-- Import script table buttons -->
+
+	<script type="text/javascript">
+		var img_path = "{% static 'png/widen.png' %}";
+		var close_img_path = "{% static 'png/decrease.png' %}";
+		var excel_img_path = "{% static 'png/excel-export.png' %}";
+		var resize_function = null;
+	</script>
+
+	<!-- Import table scripts -->
+
+	<script type="text/javascript" src="{% static 'js/big_table.js' %}"></script>
+
+	<script type="text/javascript" src="{% static 'js/table_button.js' %}"></script>
+
+{% endblock javascript %}

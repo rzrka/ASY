@@ -1,0 +1,17 @@
+{% if objects %}
+
+    {% for object in objects %}
+
+        <a href="#" class="list-item ajax-item {% if objects|length == 1 %}alone_item{% endif %}" data-id="{{object.id}}" data-model={{objectModel}}>{{object}}</a>
+
+    {% endfor %}
+
+    {% else %}
+
+    <div class="list-item">
+
+        Таблица пуста!
+
+    </div>
+
+{% endif %}

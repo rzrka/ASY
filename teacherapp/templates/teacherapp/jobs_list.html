@@ -1,0 +1,99 @@
+{% extends 'teacherapp/control_type_detail.html' %}
+
+{% load static %}
+
+{% load django_bootstrap_breadcrumbs %}
+
+{% block breadcrumbs %}
+
+	{{ block.super }}
+
+	{% breadcrumb 'Работы' 'teacherapp_control_type_job_list_url' schedule.id control_type.id %}
+
+{% endblock %}
+
+{% block content %}
+
+	<div class="row_div flex_div">
+			
+        <div class="list-div list schedule_teacherPage_Listdiv jobListDiv ">
+
+            <div class="list-item list-title">
+
+                Работы в рамках вида контроля
+
+            </div>
+
+            <div class="list-item subtitle cursor-normal">
+
+                <span>
+
+                    № работы
+
+                </span>
+
+                <span>
+
+                    Название работы (Тема)
+
+                </span>
+
+            </div>
+
+            {% if jobs %}
+
+                <div class="list-item-content">
+
+                    {% for job in jobs %}
+                    
+                        <a href="{{job.get_absolute_url}}" class="list-item">
+
+                            <span>
+                            
+                                {{job.work_number}}
+
+                            </span>
+
+                            <span>
+                                
+                                {{job.name|truncatewords:5 }}
+
+                            </span>
+                        
+                        </a>
+
+                    {% endfor %}
+                    
+                </div>
+
+            {% else %}
+
+                <div class="list-item">
+
+                    Список работ пуст!
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    {{job.get_absolute_url}}
+
+    <div class="row_div flex_div">
+
+        <a href="{% url 'teacherapp_control_type_job_create_url' schedule.id control_type.id %}" class="btn sircle_btn little_button">
+                
+            Добавить работу
+
+        </a>
+
+    </div>
+
+{% endblock content %}
+
+{% block javascript %}
+
+{% endblock javascript %}

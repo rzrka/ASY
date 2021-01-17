@@ -1,0 +1,81 @@
+{% load teacherapp_extras %}
+
+{% load static %}
+
+<table class="input_table">
+
+    <tbody>
+
+        <tr>
+
+            <th>Срок проверки</th>
+
+            <td>
+
+                <span class="verification" data-category="{{verification.delivery_date|create_term_class}}">
+
+                    <b>{{verification.delivery_date|return_term|date:"d.M.Y., H-i"}}</b> {{verification.delivery_date|create_term}}
+
+                </span>
+
+            </td>
+
+        </tr>
+
+        <tr>
+
+            <th>Студент</th>
+
+            <td><b>{{verification.control_grade.student.student.get_full_name}}</b> ({{verification.control_grade.student.studentgroup}})</td>
+
+        </tr>
+
+        <tr>
+
+            <th>Работа (дисциплина)</th>
+
+            <td>
+
+                <b>{{verification.control_grade.controlwork.control_type}} №{{verification.control_grade.controlwork.work_number}}
+
+                "{{verification.control_grade.controlwork.name}}"</b>
+
+                ({{verification.control_grade.controlwork.control_type.schedule.discipline}})
+            
+            </td>
+
+        </tr>
+
+        <tr>
+
+            <th>Файл работы</th>
+
+            <td>
+
+                {% with verification.files as file %}
+
+                    <a class="save_link" href="{% url 'mainapp_download_file_url' file.file.path %}" download>
+
+                        {% with file|get_expansion as file_expansion %}
+                        
+                            <img class="comment_image" src="{% static 'img/'|add:file_expansion|add:'.png' %}">
+                        
+                        {% endwith %}
+
+                        <div class="comment_postimage_text">
+
+                            {{file}}
+
+                        </div>            
+                    
+                    </a>
+                
+                {% endwith %}
+            
+            </td>
+
+        </tr>
+    
+    </tbody>
+
+</table>

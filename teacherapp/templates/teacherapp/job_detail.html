@@ -1,0 +1,302 @@
+{% extends 'teacherapp/jobs_list.html' %}
+
+{% load static %}
+
+{% load django_bootstrap_breadcrumbs %}
+
+{% load teacherapp_extras %}
+
+{% block style %}
+
+    {{ block.super }}
+
+    <!-- Import model styles -->
+
+	<link rel="stylesheet" type="text/css" href="{% static 'css/model.css' %}">
+
+{% endblock style %}
+
+{% block breadcrumbs %}
+
+	{{ block.super }}
+
+	{% breadcrumb job.name|truncatewords:3 'teacherapp_control_type_job_detail_url' schedule.id control_type.id job.id %}
+
+{% endblock %}
+
+{% block content %}
+
+    <div class="row_div">
+
+		<div class="document_title">
+			
+			<h3>
+				
+				Информация о работе:
+
+			</h3>
+
+            <a class="btn sircle_btn btn_secondary float-right little_button" href="{% url 'teacherapp_control_type_criterion_list_url' schedule.id control_type.id job.id %}">
+
+                Список критериев
+
+            </a>
+
+		</div>
+
+	</div>
+
+    {% include 'teacherapp/includes/form-messages_errors.html' %}
+
+	<form action="{% url 'teacherapp_control_type_job_detail_url' schedule.id control_type.id job.id %}" method="post">
+
+		{% include 'teacherapp/includes/form-table.html' %}
+
+		<div class="row_div flex_div flex_div_vertical">
+			
+			<div class="flex_div flex_horizontal_align">
+
+                <button type="submit" class="btn sircle_btn little_button">
+                
+                    Сохранить данные о работе
+                
+                </button>
+
+                <a data-iframe="delete_iframe" class="btn sircle_btn btn_secondary btn_delete little_button">
+                    
+                    Удалить работу
+
+                </a>
+
+            </div>
+
+		</div>
+
+	</form>
+
+    <form class="flex_div_horizontal" action="{% url 'teacherapp_control_type_criterion_list_url' schedule.id control_type.id job.id %}" method="post">
+
+        {% csrf_token %}
+
+        <div class="row_div flex_div flex_div_vertical">
+
+            <div class="list-div list schedule_teacherPage_Listdiv schedule_lessonsList_Listdiv control_types_Listdiv control_criterion_ListDiv">
+
+                <div class="list-item list-title">
+				
+					Критерии
+
+				</div>
+
+                <div href="#" class="list-item subtitle cursor-normal">
+
+                    <span>
+
+                        №
+
+                    </span>
+
+                    <span>
+
+                        Название 
+
+                    </span>
+
+                    <span>
+
+                        Вес
+
+                    </span>
+
+                    <span>
+
+                        Вес (норм.), %
+
+                    </span>
+
+					<span>
+
+                        Шкала
+
+                    </span>
+
+                </div>
+
+                <div class="list-item-content">
+
+					{% for control_criterion in criterion_list %}
+					
+						<div class="list-item calculate-list-item href-block-relative">
+
+							<span>
+								
+								{{control_criterion.criterion_number}}
+
+							</span>
+
+							<span>
+								
+								{{control_criterion.name}}
+
+							</span>
+
+							<span class="weight">
+
+								{% for field in criterionsweights|get_item:control_criterion.id %}
+								
+									{{field}}
+								
+								{% endfor %} 
+
+							</span>
+
+							<span class="weight_norm">
+
+							</span>
+
+							<span>
+
+								{{control_criterion.scale}}
+
+							</span>
+
+						</div>
+
+                        <div class="subcriterions">
+
+                            {% for subcriterion in control_criterion.subcriterion.all|dictsort:"criterion_number" %}
+                        
+                                <div class="list-item calculate-list-subitem href-block-relative">
+
+                                    <span>
+                                        
+                                        {{control_criterion.criterion_number}}.{{subcriterion.criterion_number}}
+
+                                    </span>
+
+                                    <span>
+                                        
+                                        {{subcriterion.name}}
+
+                                    </span>
+
+                                    <span class="weight">
+
+                                        {% for field in criterionsweights|get_item:subcriterion.id %}
+                                        
+                                            {{field}}
+                                        
+                                        {% endfor %} 
+
+                                    </span>
+
+                                    <span class="weight_norm">
+
+
+                                    </span>
+
+                                    <span>
+
+                                        {{subcriterion.scale}}
+
+                                    </span>
+
+                                    <a href="{{subcriterion.get_absolute_url}}" class="href-block left-top-href-block">
+
+                                        Редактировать
+
+                                    </a>
+
+                                </div>
+                            
+                            {% endfor %}
+
+                        </div>
+                    
+                    {% empty %}
+                    
+                        <div class="list-item group_name href-block-relative">
+
+                            <span>
+
+                                Список критериев пуст!
+
+                            </span>
+
+                        </div>
+                    
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="row_div flex_div flex_horizontal_align">
+
+            <button type="submit" class="btn sircle_btn little_button">
+
+                Сохранить данные о критериях
+
+            </button>
+
+        </div>
+
+    </form>
+
+    <div id="delete_iframe" class="iframe iframe-delete display_none">
+
+        <form class="form_delete" action="{{job.get_delete_url}}" method="post">
+
+            {% csrf_token %}
+
+            <div class="delete_title">
+                    
+                <h4>
+                    
+                    Вы уверены что хотите удалить данную работу?
+
+                </h4>
+
+            </div>
+            
+            <div class="iframe-row">
+
+                <button type="submit" class="btn btn_delete btn_delete_primary little_button">Удалить</button>
+
+            </div>
+            
+            <div class="iframe-row">
+                
+                <a class="btn btn_secondary little_button btn_cancel iframe-element-close">Не удалять</a>
+
+            </div>
+
+        </form>
+
+        <button class="iframe-btn-close ifame-close iframe-element-close"></button>
+
+    </div>
+
+{% endblock content %}
+
+{% block javascript %}
+
+    <!-- Import script close message -->
+
+	<script type="text/javascript" src="{% static 'js/close_message.js' %}"></script>
+
+    <!-- Import script model window -->
+
+	<script type="text/javascript" src="{% static 'js/model.js' %}"></script>
+
+    <!-- Import table scripts -->
+
+    <script type="text/javascript" src="{% static 'teacherapp/js/control_work_wight_calculate.js' %}"></script>
+
+    <!-- Import script scale calculate -->
+
+	<script type="text/javascript" src="{% static 'teacherapp/js/control_type_scale_calculate.js' %}"></script>
+
+{% endblock javascript %}

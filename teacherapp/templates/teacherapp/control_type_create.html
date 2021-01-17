@@ -1,0 +1,53 @@
+{% extends 'teacherapp/control_type_list.html' %}
+
+{% load static %}
+
+{% load django_bootstrap_breadcrumbs %}
+
+{% block breadcrumbs %}
+
+	{{ block.super }}
+
+	{% breadcrumb 'Новый вид контроля' 'teacherapp_control_type_create_url' schedule.id %}
+
+{% endblock %}
+
+{% block content %}
+
+	<div class="row_div">
+
+		<div class="document_title">
+			
+			<h3>
+				
+				Информация о новом виде контроля:
+
+			</h3>
+
+		</div>
+
+	</div>
+
+    {% include 'teacherapp/includes/form-messages_errors.html' %}
+
+	<form action="{% url 'teacherapp_control_type_create_url' schedule.id %}" method="post">
+
+		{% include 'teacherapp/includes/form-table.html' %}
+
+		<div class="row_div flex_div flex_div_vertical">
+			
+			<button type="submit" class="btn sircle_btn little_button">Сохранить данные</button>
+
+		</div>
+
+	</form>
+
+{% endblock content %}
+
+{% block javascript %}
+
+    <!-- Import script close message -->
+
+	<script type="text/javascript" src="{% static 'js/close_message.js' %}"></script>
+
+{% endblock javascript %}

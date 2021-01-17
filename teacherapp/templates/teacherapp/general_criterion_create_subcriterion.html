@@ -1,0 +1,77 @@
+{% extends 'teacherapp/general_criterion_detail.html' %}
+
+{% load static %}
+
+{% load django_bootstrap_breadcrumbs %}
+
+{% block breadcrumbs %}
+
+	{{ block.super }}
+
+	{% breadcrumb "Новый подкритерий" 'teacherapp_control_type_general_criterion_create_subcriterion_url' schedule.id control_type.id criterion.id %}
+
+{% endblock %}
+
+{% block content %}
+
+    <div class="row_div">
+
+		<div class="document_title">
+			
+			<h3>
+				
+				Информация о новом подкритерии:
+
+			</h3>
+
+		</div>
+
+	</div>
+
+    {% include 'teacherapp/includes/form-messages_errors.html' %}
+
+    <form action="{% url 'teacherapp_control_type_general_criterion_create_subcriterion_url' schedule.id control_type.id criterion.id  %}" method="post">
+
+		{% include 'teacherapp/includes/form-table.html' %}
+
+		<div class="row_div flex_div flex_div_vertical">
+			
+			<div class="flex_div flex_horizontal_align">
+
+                <button type="submit" class="btn sircle_btn little_button">
+                
+                    Сохранить данные
+                
+                </button>
+
+            </div>
+
+		</div>
+
+	</form>
+
+{% endblock content %}
+
+{% block javascript %}
+
+    <!-- Import script close message -->
+
+	<script type="text/javascript" src="{% static 'js/close_message.js' %}"></script>
+
+	<!-- Import script scale calculate -->
+
+	<script type="text/javascript" src="{% static 'teacherapp/js/control_type_scale_calculate.js' %}"></script>
+
+	<!-- Import calculate scripts -->
+
+	<script type="text/javascript" src="{% static 'teacherapp/js/weight_detail_calculate.js' %}"></script>
+
+	<script type="text/javascript">
+		var weight = document.getElementsByClassName("weight")[0];
+		calculateRationing({{all_weights.weight__sum}});
+		weight.oninput = function() {
+		     calculateRationing({{all_weights.weight__sum}});
+		};
+	</script>
+
+{% endblock javascript %}

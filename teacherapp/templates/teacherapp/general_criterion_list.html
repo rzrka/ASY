@@ -1,0 +1,227 @@
+{% extends 'teacherapp/control_type_detail.html' %}
+
+{% load static %}
+
+{% load django_bootstrap_breadcrumbs %}
+
+{% load teacherapp_extras %}
+
+{% block breadcrumbs %}
+
+	{{ block.super }}
+
+	{% breadcrumb 'Критерии' 'teacherapp_control_type_general_criterion_list_url' schedule.id control_type.id %}
+
+{% endblock %}
+
+{% block content %}
+
+	{% include 'teacherapp/includes/form-messages_errors.html' %}
+
+    <form class="flex_div_horizontal" action="{% url 'teacherapp_control_type_general_criterion_list_url' schedule.id control_type.id %}" method="post">
+        
+        {% csrf_token %}
+
+        <div class="row_div flex_div flex_div_vertical">
+
+            <div class="list-div list schedule_teacherPage_Listdiv schedule_lessonsList_Listdiv control_types_Listdiv control_criterion_ListDiv">
+
+                <div class="list-item list-title">
+				
+					Критерии
+
+				</div>
+
+                <div href="#" class="list-item subtitle cursor-normal">
+
+                    <span>
+
+                        №
+
+                    </span>
+
+                    <span>
+
+                        Название 
+
+                    </span>
+
+                    <span>
+
+                        Вес
+
+                    </span>
+
+                    <span>
+
+                        Вес (норм.), %
+
+                    </span>
+
+					<span>
+
+                        Шкала
+
+                    </span>
+
+                </div>
+
+                <div class="list-item-content">
+
+					{% for control_criterion in criterion_list %}
+					
+						<div class="list-item calculate-list-item href-block-relative">
+
+							<span>
+								
+								{{control_criterion.criterion_number}}
+
+							</span>
+
+							<span>
+								
+								{{control_criterion.name}}
+
+							</span>
+
+							<span class="weight">
+
+								{% for field in criterionsweights|get_item:control_criterion.id %}
+								
+									{{field}}
+								
+								{% endfor %} 
+
+							</span>
+
+							<span class="weight_norm">
+
+
+							</span>
+
+							<span>
+
+								{{control_criterion.scale}}
+
+							</span>
+
+							<a href="{% url 'teacherapp_control_type_general_criterion_detail_url' schedule.id control_type.id control_criterion.id %}" class="href-block left-top-href-block">
+
+								Редактировать
+
+							</a>
+
+							<a href="{% url 'teacherapp_control_type_general_criterion_create_subcriterion_url' schedule.id control_type.id control_criterion.id %}" class="href-block right-top-href-block">
+
+								Добавить подкритерий
+
+							</a>
+
+						</div>
+
+                        <div class="subcriterions">
+
+                            {% for subcriterion in control_criterion.subcriterion.all|dictsort:"criterion_number" %}
+                        
+                                <div class="list-item calculate-list-subitem href-block-relative">
+
+                                    <span>
+                                        
+                                        {{control_criterion.criterion_number}}.{{subcriterion.criterion_number}}
+
+                                    </span>
+
+                                    <span>
+                                        
+                                        {{subcriterion.name}}
+
+                                    </span>
+
+                                    <span class="weight">
+
+                                        {% for field in criterionsweights|get_item:subcriterion.id %}
+                                        
+                                            {{field}}
+                                        
+                                        {% endfor %} 
+
+                                    </span>
+
+                                    <span class="weight_norm">
+
+
+                                    </span>
+
+                                    <span>
+
+                                        {{subcriterion.scale}}
+
+                                    </span>
+
+                                    <a href="{% url 'teacherapp_control_type_general_criterion_detail_url' schedule.id control_type.id subcriterion.id %}" class="href-block left-top-href-block">
+
+                                        Редактировать
+
+                                    </a>
+
+                                </div>
+                            
+                            {% endfor %}
+
+                        </div>
+                    
+                    {% empty %}
+                    
+                        <div class="list-item group_name href-block-relative">
+
+                            <span>
+
+                                Список критериев пуст!
+
+                            </span>
+
+                        </div>
+                    
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="row_div flex_div flex_horizontal_align">
+            
+            <a href="{% url 'teacherapp_control_type_general_criterion_create_url' schedule.id control_type.id %}" class="btn sircle_btn little_button">
+                
+				Добавить критерий
+
+			</a>
+
+            <button type="submit" class="btn sircle_btn little_button save_div">
+
+                <img src="{% static 'img/save-20.png' %}" title="Сохранить" alt="Сохранить">
+
+            </button>
+
+        </div>
+        
+    </form>
+
+{% endblock content %}
+
+{% block javascript %}
+
+    <!-- Import script close message -->
+
+	<script type="text/javascript" src="{% static 'js/close_message.js' %}"></script>
+
+	<!-- Import table scripts -->
+
+	<script type="text/javascript" src="{% static 'teacherapp/js/control_work_wight_calculate.js' %}"></script>
+
+	<!-- Import table scripts -->
+
+	<script type="text/javascript" src="{% static 'js/show_href_blocks.js' %}"></script>
+
+{% endblock javascript %}

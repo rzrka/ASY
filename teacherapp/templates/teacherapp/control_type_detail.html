@@ -1,0 +1,133 @@
+{% extends 'teacherapp/control_type_list.html' %}
+
+{% load static %}
+
+{% load django_bootstrap_breadcrumbs %}
+
+{% block style %}
+
+    {{ block.super }}
+
+    <!-- Import model styles -->
+
+	<link rel="stylesheet" type="text/css" href="{% static 'css/model.css' %}">
+
+{% endblock style %}
+
+{% block breadcrumbs %}
+
+	{{ block.super }}
+
+	{% breadcrumb control_type.name|add:"(Редактировать)" 'teacherapp_control_type_detail_url' schedule.id control_type.id %}
+
+{% endblock %}
+
+{% block content %}
+
+	<div class="row_div">
+
+		<div class="document_title">
+			
+			<h3>
+				
+				Информация о виде контроля:
+
+			</h3>
+
+            <a class="btn sircle_btn btn_secondary float-right little_button" href="{% url 'teacherapp_control_type_job_list_url' schedule.id control_type.id %}">
+
+                Перейти к работам
+
+            </a>
+
+		</div>
+
+	</div>
+
+    {% include 'teacherapp/includes/form-messages_errors.html' %}
+
+	<form action="{{control_type.get_absolute_url}}" method="post">
+
+		{% include 'teacherapp/includes/form-table.html' %}
+		
+		<div class="row_div flex_div flex_div_vertical">
+
+			<div class="flex_div flex_horizontal_align">
+
+                <button type="submit" class="btn sircle_btn little_button">
+                
+                    Сохранить данные
+                
+                </button>
+
+                <a data-iframe="delete_iframe" class="btn sircle_btn btn_secondary btn_delete little_button">
+                    
+                    Удалить вид контроля
+
+                </a>
+
+            </div>
+
+            <a href="{% url 'teacherapp_control_type_job_create_url' schedule.id control_type.id %}" class="btn sircle_btn btn_secondary little_button">
+                    
+                Добавить работу
+
+            </a>
+
+            {% comment %} <a href="{% url 'teacherapp_control_type_job_list_url' schedule.id control_type.id %}" class="btn sircle_btn btn_secondary little_button">
+                    
+                Перейти к работам
+
+            </a> {% endcomment %}
+
+		</div>
+
+	</form>
+
+	<div id="delete_iframe" class="iframe iframe-delete display_none">
+
+        <form class="form_delete" action="{{control_type.get_delete_url}}" method="post">
+
+            {% csrf_token %}
+
+            <div class="delete_title">
+                    
+                <h4>
+                    
+                    Вы уверены что хотите удалить вид контроля "{{control_type.name}}"?
+
+                </h4>
+
+            </div>
+            
+            <div class="iframe-row">
+
+                <button type="submit" class="btn btn_delete btn_delete_primary little_button">Удалить</button>
+
+            </div>
+            
+            <div class="iframe-row">
+                
+                <a class="btn btn_secondary little_button btn_cancel iframe-element-close">Не удалять</a>
+
+            </div>
+
+        </form>
+
+        <button class="iframe-btn-close ifame-close iframe-element-close"></button>
+
+    </div>
+
+{% endblock content %}
+
+{% block javascript %}
+
+    <!-- Import script close message -->
+
+	<script type="text/javascript" src="{% static 'js/close_message.js' %}"></script>
+
+    <!-- Import script model window -->
+
+	<script type="text/javascript" src="{% static 'js/model.js' %}"></script>
+
+{% endblock javascript %}

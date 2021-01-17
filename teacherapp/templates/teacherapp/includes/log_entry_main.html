@@ -1,0 +1,63 @@
+<div class="row_div">
+
+    <div class="document_title">
+        
+        <h3>
+        
+            Выберите данные для открытия журнала
+
+        </h3>
+
+        <a class="btn sircle_btn btn_secondary float-right little_button" href="{% url 'teacherapp_schedule_list_url' %}">
+        
+            Список доступных журналов
+        
+        </a>
+
+    </div>
+
+</div>
+
+<div class="row_div flex_div">
+    
+    <div class="list-div list main_teacherPage_Listdiv">
+
+        <div class="list-item list-title">Семестры</div>
+
+        <div class="list-item-content">
+
+            {% include 'teacherapp/includes/list-item-content.html' with objects=semesters objectModel="Semester" %}
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="row_div">
+    
+    <div class="list-div list main_teacherPage_Listdiv">
+
+        <div class="list-item list-title">Группы</div>
+
+        <div class="list-item-content">
+
+            {% include 'teacherapp/includes/list-item-content.html' with objects=groups objectModel="StudentGroup" %}
+
+        </div>
+
+    </div>
+
+    <div class="list-div list main_teacherPage_Listdiv">
+
+        <div class="list-item list-title">Дисциплины</div>
+
+        <div class="list-item-content">
+
+            {% include 'teacherapp/includes/list-item-content.html' with objects=disciplines objectModel="Discipline" %}
+
+        </div>
+
+    </div>
+
+</div>

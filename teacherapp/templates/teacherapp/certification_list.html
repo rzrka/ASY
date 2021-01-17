@@ -1,0 +1,51 @@
+{% extends 'teacherapp/control_type_list.html' %}
+
+{% load static %}
+
+{% load django_bootstrap_breadcrumbs %}
+
+{% block breadcrumbs %}
+
+	{{ block.super }}
+
+	{% breadcrumb 'Список аттестаций' 'teacherapp_certification_list_url' schedule.id %}
+
+{% endblock %}
+
+{% load teacherapp_extras %}
+
+{% block content %}
+
+    <div class="row_div flex_div">
+
+        {% include 'teacherapp/includes/certification_list_include.html' %}
+
+    </div>
+
+    <div class="row_div flex_div flex_horizontal_align">
+        
+        <a href="{% url 'teacherapp_certification_create_url' schedule.id %}" class="btn sircle_btn little_button">
+        
+            Добавить аттестацию
+        
+        </a>
+
+    </div>
+
+{% endblock content %}
+
+{% block javascript %}
+
+    <!-- Import script close message -->
+
+	<script type="text/javascript" src="{% static 'js/close_message.js' %}"></script>
+
+    <!-- Import table scripts -->
+
+	<script type="text/javascript" src="{% static 'js/show_href_blocks.js' %}"></script>
+
+    <!-- Import script close message -->
+
+	<script type="text/javascript" src="{% static 'js/close_message.js' %}"></script>
+
+{% endblock javascript %}

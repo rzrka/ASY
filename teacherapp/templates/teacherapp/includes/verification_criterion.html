@@ -1,0 +1,79 @@
+{% load teacherapp_extras %}
+
+<div data-criterion="{{include_criterion.id}}" class="list-item calculate-list-subitem href-block-relative cursor-normal">
+
+    <span>
+        
+        {% if include_criterion.criterion.control_type.all %}   {% comment %} если это общий критерий {% endcomment %}
+
+            <div title="Общий критерий">
+
+                <b>
+
+                    Общий критерий:
+
+                </b>
+
+            </div>
+
+        {% endif %}
+    
+        {% if is_subcriterion %}
+    
+            {{is_subcriterion.criterion.criterion_number}}.{{include_criterion.criterion.criterion_number}}.
+        
+        {% else %}
+
+            {{include_criterion.criterion.criterion_number}}.
+        
+        {% endif %}
+
+        {{include_criterion.criterion.name}}
+
+    </span>
+
+    {% with criterionsgrades|get_item:include_criterion.id as criterion %}
+    
+        <span class="weight" data-weight="{{include_criterion.criterion.weight}}" data-scale="{{include_criterion.criterion.scale.dimension}}" {% if is_subcriterion %}data-general_criterion="{{is_subcriterion.id}}"{% endif %}>
+
+            {% if include_criterion.criterion.scale.dimension == 2 %}
+            
+                {% for choise in criterion.visible_fields.0 %}
+
+                    <label class="btn sircle_btn btn_secondary btn_toggle little_button" data-class="{{choise.choice_label}}" for="{{ choise.id_for_label  }}">
+                    
+                        {{ choise.tag }}
+
+                        {{ choise.choice_label }}
+
+                    </label>
+                
+                {% endfor %}
+            
+            {% else %}
+            
+                {% for field in criterion %}
+            
+                    {{field}}
+                
+                {% endfor %}
+            
+            {% endif %}
+        
+        </span>
+    
+    {% endwith %}
+
+    <span>
+
+        {% for comment in include_criterion.tele_work_criterion_comment.all %}
+        
+            <div data-comment_id="{{comment.id}}" class="comment">{{comment}}<a class="comment_delete"></a></div>
+        
+        {% endfor %}
+
+        <a class="simple-link" data-iframe="add_comment">Добавить замечание</a>
+
+    </span>
+
+</div>

@@ -1,0 +1,127 @@
+{% extends 'teacherapp/log_entry.html' %}
+
+{% load static %}
+
+{% load django_bootstrap_breadcrumbs %}
+
+{% load teacherapp_extras %}
+
+{% block breadcrumbs %}
+
+	{{ block.super }}
+
+	{% breadcrumb 'Проверка работ' 'teacherapp_works_verification_url' %}
+
+{% endblock %}
+
+{% block content %}
+
+    {% include 'teacherapp/includes/form-messages_errors.html' %}
+
+    <div class="row_div flex_div">
+			
+        <div class="list-div list schedule_lessonsList_Listdiv schedule_teacherPage_Listdiv">
+
+            <div class="list-item list-title">Очередь работ на проверку</div>
+
+            <div class="list-item subtitle cursor-normal">
+
+                <span>
+
+                    №
+
+                </span>
+
+                <span>
+
+                    Срок проверки 
+
+                </span>
+
+                <span>
+
+                    ФИО студента(группа)
+
+                </span>
+
+                <span>
+
+                    Работа (дисциплина)
+
+                </span>
+
+            </div>
+
+            {% if teleworks %}
+
+                <div class="list-item-content list-item-color-content">
+
+                    {% for telework in teleworks %}
+                    
+                        <a href="{{telework.get_absolute_url}}" class="list-item">
+
+                            <span>
+                            
+                                {{forloop.counter}}
+
+                            </span>
+
+                            <span class="colored-item" data-category="{{telework.delivery_date|create_term_class}}">
+                                
+                                <b>{{telework.delivery_date|return_term|date:"d.M., H-i"}}</b>
+
+                                <br>{{telework.delivery_date|create_term}}
+
+                            </span>
+
+                            <span>
+                                
+                                {{telework.control_grade.student.student.get_full_name}} ({{telework.control_grade.student.studentgroup}})
+
+                            </span>
+
+                            <span>
+                                
+                                {{telework.control_grade.controlwork.control_type}} №{{telework.control_grade.controlwork.work_number}}
+
+                                ({{telework.control_grade.controlwork.control_type.schedule.discipline}})
+
+                            </span>
+                        
+                        </a>
+
+                    {% endfor %}
+                    
+                </div>
+
+            {% else %}
+
+                <div class="list-item">
+
+                    Список работ пуст!
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+{% endblock content %}
+
+{% block javascript %}
+
+    <!-- Import table scripts -->
+
+	{% comment %} <script type="text/javascript" src="{% static 'teacherapp/js/control_work_wight_calculate.js' %}"></script> {% endcomment %}
+
+	<!-- Import table scripts -->
+
+	<script type="text/javascript" src="{% static 'js/show_href_blocks.js' %}"></script>
+
+    <!-- Import script close message -->
+
+	<script type="text/javascript" src="{% static 'js/close_message.js' %}"></script>
+
+{% endblock javascript %}

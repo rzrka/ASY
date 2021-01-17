@@ -1,0 +1,99 @@
+{% load static %}
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+	<title>ASY authorization</title>
+
+	<meta charset="utf-8">
+
+	<link rel="stylesheet" type="text/css" href="{% static 'css/main_style.css' %}">
+
+	<link rel="stylesheet" type="text/css" href="{% static 'css/authorization.css' %}">
+
+	<!-- Import Roboto font -->
+
+	<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+
+	<div class="container">
+
+		<div class="column"></div>
+
+		<div class="content">
+
+			<div class="logo">
+
+				асу
+
+				<br>
+
+				<span>
+
+					успеваемость студентов
+
+				</span>
+
+			</div>
+
+			<form class="form_authorization" action="{% url 'mainapp_login_url' %}" method="post">
+
+				{% csrf_token %}
+
+				<div class="inputset loginset">
+
+					{{ form.username }}
+
+					{% if form.errors.username %}
+
+						<div class="error"><span>!</span></div>
+
+						<div class="error-message width_show">
+
+							{% for error in form.errors.username %}
+
+								{{error}}
+
+							{% endfor %}
+
+						</div>
+					
+					{% endif %}
+
+				</div>
+
+				<div class="inputset passwordset">
+
+					{{form.password}}
+
+				</div>
+
+				<div class="buttonset">
+
+					<button class="btn">Авторизоваться</button>
+
+					{# <a href="#">Забыли логин?</a> #}
+
+					{% comment %} <a href="#">Забыли пароль?</a> {% endcomment %}
+
+				</div>
+
+				<input type="hidden" name="next" value="{{ next }}" />
+				
+			</form>
+			
+		</div>
+
+	</div>
+
+	<script type="text/javascript" src="{% static 'js/authorization/show_error_message_authorization.js' %}"></script>
+
+</body>
+
+</html>

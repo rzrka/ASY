@@ -1,0 +1,77 @@
+{% extends 'teacherapp/lesson_detail_main.html' %}
+
+{% load django_bootstrap_breadcrumbs %}
+
+{% block breadcrumbs %}
+
+	{{ block.super }}
+
+	{% breadcrumb "Посещаемость" 'teacherapp_lesson_student_attendance_url' schedule.id lesson.id %}
+
+{% endblock %}
+
+{% block content %}
+
+    <div class="row_div flex_div">
+			
+        <div class="list-div list schedule_teacherPage_Listdiv attendanceListDiv">
+
+            <div class="list-item list-title">Посещаемость</div>
+
+            <div class="list-item subtitle cursor-normal">
+
+                <span>
+
+                    Студент
+
+                </span>
+
+                <span>
+
+                    Посещение 
+
+                </span>
+
+            </div>
+
+            {% if grades %}
+
+                <div class="list-item-content">
+
+                    {% for grade in grades %}
+                    
+                        <a href="{{grade.get_absolute_url}}" class="list-item">
+
+                            <span>
+                            
+                                {{grade.student.student.get_full_name_initials}}
+
+                            </span>
+
+                            <span>
+                                
+                                {{grade.get_grade_display }}
+
+                            </span>
+                        
+                        </a>
+
+                    {% endfor %}
+                    
+                </div>
+
+            {% else %}
+
+                <div class="list-item">
+
+                    Таблица пуста!
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+{% endblock content %}

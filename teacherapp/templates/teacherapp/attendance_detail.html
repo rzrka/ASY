@@ -1,0 +1,307 @@
+{% extends 'teacherapp/attendance_list.html' %}
+
+{% load django_bootstrap_breadcrumbs %}
+
+{% load static %}
+
+{% load teacherapp_extras %}
+
+{% block breadcrumbs %}
+
+	{{ block.super }}
+
+	{% breadcrumb grade.student.student.get_full_name 'teacherapp_lesson_student_attendance_detail_url' schedule.id lesson.id grade.id %}
+
+{% endblock %}
+
+{% block content %}
+
+    <div class="row_div">
+
+        <div class="document_title">
+            
+            <h3>
+                
+                Информация о посещении занятия обучаемым:
+
+            </h3>
+
+        </div>
+
+    </div>
+
+    {% include 'teacherapp/includes/form-messages_errors.html' %}
+
+    {% if form_comment.errors %}
+
+        <div class="row_div errors_div">
+
+            {% for field in form_comment %}
+
+                {% for error in field.errors %}
+
+                    <div class="error">
+                    
+                        (поле "{{field.label}}") {{error}}
+
+                        <span class="closebtn">&times;</span>
+
+                    </div>
+                
+                {% endfor %}
+            
+            {% endfor %}
+
+        </div>
+
+    {% endif %}
+
+    {% if form_file.errors %}
+
+        <div class="row_div errors_div">
+
+            {% for field in form_file %}
+
+                {% for error in field.errors %}
+
+                    <div class="error">
+                    
+                        (поле "{{field.label}}") {{error}}
+
+                        <span class="closebtn">&times;</span>
+
+                    </div>
+                
+                {% endfor %}
+            
+            {% endfor %}
+
+        </div>
+
+    {% endif %}
+
+    <form method="post" action="{% url 'teacherapp_lesson_student_attendance_detail_url' schedule.id lesson.id grade.id %}" enctype="multipart/form-data">
+
+        {% csrf_token %}
+
+        {% for hidden in form.hidden_fields %}
+            {{ hidden }}
+        {% endfor %}
+
+        {% for hidden in form_comment.hidden_fields %}
+            {{ hidden }}
+        {% endfor %}
+
+        {% for hidden in form_file.hidden_fields %}
+            {{ hidden }}
+        {% endfor %}
+
+        <div class="row_div">
+
+            <table class="input_table">
+
+                <tbody>
+
+                    <tr>
+
+                        <th>Обучаемый</th>
+
+                        <td>{{grade.student.student.get_full_name}}</td>
+
+                    </tr>
+
+                    <tr>
+
+                        <th>№ занятия</th>
+
+                        <td>{{grade.auditorylessons.lessons_number}}</td>
+
+                    </tr>
+
+                    <tr>
+
+                        <th>Дата</th>
+
+                        <td>{{grade.auditorylessons.date|date:"d.m.Y"}}</td>
+
+                    </tr>
+
+                    <tr>
+
+                        <th>Вид занятия</th>
+
+                        <td>{{grade.auditorylessons.get_type_employment_display}}</td>
+
+                    </tr>
+
+                    <tr>
+
+                        <th>Тема</th>
+
+                        <td>{{grade.auditorylessons.theme}}</td>
+
+                    </tr>
+
+                    {% for field in form.visible_fields %}
+
+                        <tr>
+
+                            <th><label>{{field.label}}</label></th>
+
+                            <td>
+                            
+                                {% for choise in field|slice:"3" %}
+
+                                    <label class="btn sircle_btn btn_secondary btn_toggle" data-class="{{choise.choice_label}}" for="{{ choise.id_for_label  }}">
+                                    
+                                        {{ choise.tag }}
+
+                                        {{ choise.choice_label }}
+
+                                    </label>
+                                
+                                {% endfor %}
+
+                                <label class="btn sircle_btn btn_secondary btn_toggle btn-hidden" data-class="{{field.3.choice_label}}" for="{{ field.3.id_for_label  }}">
+                                    
+                                    {{ field.3.tag }}
+
+                                    {{ field.3.choice_label }}
+
+                                </label>
+                                
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                    <tr>
+
+                        <th>Отправить комментарий</th>
+
+                        <td>
+
+                            {% for f in form_comment.visible_fields %}
+                            
+                                {{f}}
+
+                            {% endfor %}
+
+                            {% for field in form_file.visible_fields %}
+                            
+                                {{field}}
+
+                                <label for="id_file_form-file">
+
+                                    <span>
+                                        
+                                        Загрузить файл
+
+                                    </span>	
+
+                                </label>
+                            
+                            {% endfor %}
+
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <th>История комментариев</th>
+
+                        <td>
+
+                            {% for comment in grade.comments.all %}
+
+                                <div class="chat_item">
+
+                                    <div class="chat_author">
+
+                                        {% if comment.author == user %}
+
+                                            Вы:
+                                            
+                                        {% else %}
+                                            
+                                            {{comment.author.get_full_name_initials}}:
+                                            
+                                        {% endif %}
+
+                                        <span class="chat_datetime">
+
+                                            {{comment.pub_date|date:"d.m.Y H:i"}}
+
+                                        </span>
+
+                                    </div>
+
+                                    {{comment}}
+
+                                    {% for file in comment.files.all %}
+
+                                        <a href="{% url 'mainapp_download_file_url' file.file.path %}" download>
+                                            
+                                            {% with file|get_expansion as file_expansion %}
+                    
+                                                <img class="comment_image" src="{% static 'img/'|add:file_expansion|add:'.png' %}">
+                                            
+                                            {% endwith %}
+
+                                            <div class="comment_postimage_text">
+
+                                                {{file}}
+
+                                            </div>  
+                                            
+                                        </a>
+                                    
+                                    {% endfor %}
+
+                                </div>
+
+                            {% empty %}
+
+                                -
+                            
+                            {% endfor %}
+
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <div class="row_div flex_div flex_div_vertical">
+			
+			<button type="submit" name="simple_submit" class="btn sircle_btn little_button">Сохранить данные</button>
+
+			<button type="submit" name="comment_submit" class="btn sircle_btn little_button">Сохранить данные и отправить комментарий</button>
+
+		</div>
+
+    </form>
+
+{% endblock content %}
+
+{% block javascript %}
+
+    <!-- Import script toggle button -->
+
+	<script type="text/javascript" src="{% static 'js/multiple_file.js' %}"></script>
+
+    <!-- Import script toggle button -->
+
+	<script type="text/javascript" src="{% static 'js/toggle_button.js' %}"></script>
+
+    <!-- Import script close message -->
+
+	<script type="text/javascript" src="{% static 'js/close_message.js' %}"></script>
+
+{% endblock javascript %}

@@ -1,0 +1,260 @@
+{% extends 'teacherapp/write_job_list.html' %}
+
+{% load static %}
+
+{% load django_bootstrap_breadcrumbs %}
+
+{% load teacherapp_extras %}
+
+{% block style %}
+
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+{% endblock style %}
+
+{% block breadcrumbs %}
+
+	{{ block.super }}
+
+    {% with job.work_number|stringformat:"i" as name %}
+
+        {% breadcrumb "№"|add:name 'teacherapp_job_write_url' schedule.id control_type.id job.id %}
+
+    {% endwith %}
+
+{% endblock %}
+
+{% block content %}
+
+    <div class="row_div">
+
+        <div class="document_title">
+            
+            <h3>
+                
+                Информация о работе:
+
+            </h3>
+
+        </div>
+
+    </div>
+
+    {% include 'teacherapp/includes/form-messages_errors.html' %}
+
+    <div class="row_div">
+
+        <table class="input_table">
+
+            <tbody>
+
+                <tr>
+
+                    <th>Номер работы</th>
+
+                    <td>
+
+                        <span class="verification">
+
+                            {{job.work_number}}
+
+                        </span>
+
+                    </td>
+
+                </tr>
+
+                <tr>
+
+                    <th>Название</th>
+
+                    <td>
+
+                        <span class="verification" data-category="{{verification.term}}">
+
+                            {{job.name}}
+
+                        </span>
+
+                    </td>
+
+                </tr>
+            
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <form method="post" action="{% url 'teacherapp_job_write_url' schedule.id control_type.id job.id %}">
+
+        {% csrf_token %}
+
+        <div class="row_div flex_div">
+        
+            <div class="list-div list schedule_lessonsList_Listdiv schedule_teacherPage_Listdiv attendanceDiv">
+
+                <div class="list-item list-title">Результаты контроля студентов</div>
+
+                <div class="list-item subtitle cursor-normal">
+
+                    <span>
+
+                        №
+
+                    </span>
+
+                    <span>
+
+                        Студенты группы 
+
+                    </span>
+
+                    <span>
+
+                        Оценка
+
+                    </span>
+
+                </div>
+
+                <div class="list-item-content">
+
+                    {% for grade in grades %}
+
+                        <div class="list-item cursor-normal">
+
+                            <span>
+
+                                {% with history_verificaions|get_history_verification:grade.instance.student as history_verificaion %}
+                                
+                                    {% if history_verificaion %}
+                                    
+                                        <a href="{% url 'teacherapp_works_verification_history_url' history_verificaion.id %}" class="simple-link" title="История проверок">
+
+                                            {{grade.instance.student.version_in_group}}
+
+                                        </a>
+                                    
+                                    {% else %}
+
+                                        <a class="simple-link" title="История проверок">
+
+                                            {{grade.instance.student.version_in_group}}
+
+                                        </a>
+                                    
+                                    {% endif %}
+                                
+                                {% endwith %}
+
+                            </span>
+
+                            <span>
+
+                                {{grade.instance.student.student.get_full_name}}
+
+                            </span>
+
+                            <span class="weight" data-class="" data-scale="{{grade.instance.controlwork.scale.dimension}}">
+
+                                {% if is_radio %}
+
+                                    {% for choise in grade.visible_fields.0 %}
+
+                                        <label class="btn sircle_btn btn_secondary btn_toggle little_button" data-class="{{choise.choice_label}}" for="{{ choise.id_for_label  }}">
+                                        
+                                            {{ choise.tag }}
+
+                                            {{ choise.choice_label }}
+
+                                        </label>
+                                    
+                                    {% endfor %}
+                                
+                                {% else %}
+                                
+                                    {% for choise in grade.visible_fields.0 %}
+
+                                        {{choise}}
+
+                                    {% endfor %}
+                                
+                                {% endif %}
+
+                            </span>
+
+                        </div>
+                    
+                    {% empty %}
+
+                        <div class="list-item">
+
+                            Список студентов пуст!
+
+                        </div>
+                    
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="row_div flex_div flex_div_vertical">
+
+            <div class="flex_div flex_horizontal_align">
+
+                <button type="submit" class="btn sircle_btn little_button">
+                
+                    Сохранить данные
+                
+                </button>
+
+            </div>
+
+            <a href="{% url 'teacherapp_job_write_survey_url' schedule.id control_type.id job.id %}" class="btn sircle_btn btn_secondary little_button">
+            
+                Выставление оценок
+            
+            </a>
+
+        </div>
+
+    </form>
+
+{% endblock content %}
+
+{% block javascript %}
+
+    <script type="text/javascript">
+        var general_classes = null;
+    </script>
+
+    <!-- Import script toggle button -->
+
+	<script type="text/javascript" src="{% static 'js/toggle_button.js' %}"></script>
+
+    <!-- Import script close message -->
+
+	<script type="text/javascript" src="{% static 'js/close_message.js' %}"></script>
+
+    <!-- Import color input script -->
+
+	<script type="text/javascript" src="{% static 'js/color_numberinputs.js' %}"></script>
+
+    <script type="text/javascript">
+        (function() {
+            $('.weight').each(function(index, element) {
+                var weight = $(this);
+                $(this).find('input, select').on('change', function() {
+                    set_numberimputs_color(); // цвета inputов[type=number]
+                });
+            });
+            set_numberimputs_color();
+        })();
+    </script>
+
+{% endblock javascript %}

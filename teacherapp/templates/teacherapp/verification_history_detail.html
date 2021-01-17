@@ -1,0 +1,445 @@
+{% extends 'teacherapp/verification_history.html' %}
+
+{% load static %}
+
+{% load django_bootstrap_breadcrumbs %}
+
+{% load teacherapp_extras %}
+
+{% block style %}
+
+    <!-- Import model styles -->
+
+	<link rel="stylesheet" type="text/css" href="{% static 'css/model.css' %}">
+
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+{% endblock style %}
+
+{% block breadcrumbs %}
+
+	{{ block.super }}
+
+	{% breadcrumb history_verification.check_date|date:"d.m.Y, H:i" 'teacherapp_works_verification_history_detail_url' verification.id history_verification.id %}
+
+{% endblock %}
+
+{% block content %}
+
+    <div class="row_div">
+
+        <table class="input_table">
+
+            <tbody>
+
+                <tr>
+
+                    <th>Студент</th>
+
+                        <td><b>{{verification.control_grade.student.student.get_full_name}}</b> ({{verification.control_grade.student.studentgroup}})</td>
+
+                    </tr>
+
+                    <tr>
+
+                        <th>Работа (дисциплина)</th>
+
+                    <td>
+
+                        <b>{{verification.control_grade.controlwork.control_type}} №{{verification.control_grade.controlwork.work_number}}
+
+                        "{{verification.control_grade.controlwork.name}}"</b>
+
+                        ({{verification.control_grade.controlwork.control_type.schedule.discipline}})
+                        
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <div class="row_div pass_div">
+
+        <b>Проверка от {{history_verification.check_date|date:"d.m.Y, H:i"}}</b>
+
+        (
+            
+        степень выполнения работы:
+
+        <span data-category="{% if history_verification.control_grade.controlwork.scale.dimension == 2 %}{{history_verification|grade_attendance_offset_grade}}{% elif history_verification.control_grade.controlwork.scale.dimension == 5 %}{{history_verification.grade}}{% else %}{{history_verification|get_normal_grade_verification}}{% endif %}">
+
+        {% if history_verification.control_grade.controlwork.scale.dimension == 2 %}
+
+            {% if history_verification.grade == 2 %}
+            
+                Зачет
+
+            {% else %}
+            
+                Незачет
+
+            {% endif %}
+
+        {% else %}
+
+            {{history_verification.grade}}{% if history_verification.control_grade.controlwork.scale.dimension == 100 %}%{% else %}/{{history_verification.control_grade.controlwork.scale.dimension}}{% endif %}
+
+        {% endif %}
+
+        </span>
+
+        ):
+
+    </div>
+
+    <div class="row_div pass_div verification_div">
+
+        <b>Файл работы: </b>
+
+        {% with history_verification.files as file %}
+
+            <a class="save_link" href="{% url 'mainapp_download_file_url' file.file.path %}" download>
+                
+                {% with file|get_expansion as file_expansion %}
+                    
+                    <img class="comment_image" src="{% static 'img/'|add:file_expansion|add:'.png' %}">
+                
+                {% endwith %}
+
+                <div class="comment_postimage_text">
+
+                    {{file}}
+
+                </div>
+                
+            </a>
+        
+        {% endwith %}
+
+    </div>
+
+    <div class="row_div flex_div flex_div_vertical">
+
+        <div class="list-div list schedule_teacherPage_Listdiv work_werification_listDiv">
+
+            <div href="#" class="list-item subtitle cursor-normal">
+
+                <span>
+
+                    Критерий
+
+                </span>
+
+                <span>
+
+                    Оценка 
+
+                </span>
+
+                <span>
+
+                    Замечание/примечание
+
+                </span>
+
+            </div>
+
+            <div class="list-item-content">
+
+                {% for verification_criterion in history_verification|general_criterions %}
+                
+                    {% with verification_criterion as include_criterion %}
+                    
+                        <div data-criterion="{{include_criterion.id}}" class="list-item calculate-list-subitem href-block-relative cursor-normal">
+
+                            <span>
+
+                                {% if include_criterion.criterion.control_type.all %}   {% comment %} если это общий критерий {% endcomment %}
+        
+                                    <div title="Общий критерий">
+
+                                        <b>
+
+                                            Общий критерий:
+
+                                        </b>
+
+                                    </div>
+
+                                {% endif %}
+
+                                {{include_criterion.criterion.criterion_number}}.
+                                
+                                {{include_criterion.criterion.name}}
+
+                            </span>
+
+                            {% with criterionsgrades|get_item:include_criterion.id as criterion %}
+                            
+                                <span class="weight" data-weight="{{include_criterion.criterion.weight}}" data-scale="{{include_criterion.criterion.scale.dimension}}" {% if is_subcriterion %}data-general_criterion="{{is_subcriterion.id}}"{% endif %}>
+
+                                    {% if include_criterion.criterion.scale.dimension == 2 %}
+                                    
+                                        {% for choise in criterion.visible_fields.0 %}
+
+                                            <label class="btn sircle_btn btn_secondary btn_toggle little_button" data-class="{{choise.choice_label}}" for="{{ choise.id_for_label  }}">
+                                            
+                                                {{ choise.tag }}
+
+                                                {{ choise.choice_label }}
+
+                                            </label>
+                                        
+                                        {% endfor %}
+                                    
+                                    {% else %}
+                                    
+                                        {% for field in criterion %}
+                                    
+                                            {{field}}
+                                        
+                                        {% endfor %}
+                                    
+                                    {% endif %}
+                                
+                                </span>
+                            
+                            {% endwith %}
+
+                            <span>
+
+                                {% for comment in include_criterion.tele_work_criterion_comment.all %}
+                                
+                                    <div class="colored_text_comment comment" data-grade="2">{{comment}}</div>
+                                
+                                {% empty %}
+                                            
+                                    <div class="colored_text_comment comment" data-grade="5">Нет замечаний</div>
+
+                                {% endfor %}
+
+                                {% if include_criterion.tele_work_criterion_comment_student.all %}
+
+                                    <div class="comment_block">
+
+                                        <div>
+
+                                            <b>
+                                    
+                                                Примечания студента:
+
+                                            </b>
+
+                                        </div>
+
+                                        {% for comment in include_criterion.tele_work_criterion_comment_student.all %}
+
+                                            <div class="colored_text_comment comment">{{comment}}</div>
+                                    
+                                        {% endfor %}
+
+                                        </div>
+
+                                {% endif %}
+
+                            </span>
+
+                        </div>
+                    
+                    {% endwith %}
+
+                    <div class="subcriterions">
+                    
+                        {% for verification_subcriterion in verification_criterion|subcriterions:history_verification %}
+                    
+                            {% with verification_subcriterion as include_criterion %}
+
+                                {% with verification_criterion as is_subcriterion %}
+                                
+                                    <div data-criterion="{{include_criterion.id}}" class="list-item calculate-list-subitem href-block-relative cursor-normal">
+
+                                        <span>
+
+                                            {{is_subcriterion.criterion.criterion_number}}.{{include_criterion.criterion.criterion_number}}.
+                                            
+                                            {{include_criterion.criterion.name}}
+
+                                        </span>
+
+                                        {% with criterionsgrades|get_item:include_criterion.id as criterion %}
+                                        
+                                            <span class="weight" data-weight="{{include_criterion.criterion.weight}}" data-scale="{{include_criterion.criterion.scale.dimension}}" {% if is_subcriterion %}data-general_criterion="{{is_subcriterion.id}}"{% endif %}>
+
+                                                {% if include_criterion.criterion.scale.dimension == 2 %}
+                                                
+                                                    {% for choise in criterion.visible_fields.0 %}
+
+                                                        {% if choise.tag|get_value %}
+                                                        
+                                                            <label class="btn sircle_btn btn_secondary btn_toggle little_button" data-class="{{choise.choice_label}}" for="{{ choise.id_for_label }}">
+                                                        
+                                                                {{ choise.tag }}
+
+                                                                {{ choise.choice_label }}
+
+                                                            </label>
+                                                        
+                                                        {% else %}
+
+                                                            <label class="btn sircle_btn btn_secondary btn_toggle little_button btn-hidden" data-class="{{choise.choice_label}}" for="{{ choise.id_for_label }}">
+                                                        
+                                                                {{ choise.tag }}
+
+                                                                {{ choise.choice_label }}
+
+                                                            </label>
+
+                                                        {% endif %}
+
+                                                    {% endfor %}
+                                                
+                                                {% else %}
+                                                
+                                                    {% for field in criterion %}
+                                                
+                                                        {{field}}
+                                                    
+                                                    {% endfor %}
+                                                
+                                                {% endif %}
+                                            
+                                            </span>
+                                        
+                                        {% endwith %}
+
+                                        <span>
+
+                                            {% for comment in include_criterion.tele_work_criterion_comment.all %}
+                                
+                                                <div class="colored_text_comment comment" data-grade="2">{{comment}}</div>
+                                            
+                                            {% empty %}
+                                                        
+                                                <div class="colored_text_comment comment" data-grade="5">Нет замечаний</div>
+
+                                            {% endfor %}
+
+                                            {% if include_criterion.tele_work_criterion_comment_student.all %}
+
+                                                <div class="comment_block">
+
+                                                    <div>
+
+                                                        <b>
+                                                
+                                                            Примечания студента:
+
+                                                        </b>
+
+                                                    </div>
+
+                                                    {% for comment in include_criterion.tele_work_criterion_comment_student.all %}
+
+                                                        <div class="colored_text_comment comment">{{comment}}</div>
+                                                
+                                                    {% endfor %}
+
+                                                 </div>
+
+                                            {% endif %}
+
+                                        </span>
+
+                                    </div>
+                                
+                                {% endwith %}
+                            
+                            {% endwith %}
+                        
+                        {% endfor %}
+                    
+                    </div>
+                    
+                {% endfor %}
+
+            </div>
+        
+        </div>
+
+    </div>
+
+    <div class="row_div pass_div1">
+
+        <div>
+
+            <b>
+        
+                Дополнительные примечания преподавателя:
+
+            </b>
+        
+        </div>
+
+        <span class="additional_comment">{% if history_verification.additional_comment %}{{history_verification.additional_comment}}{% else %}Комментария нет!{% endif %}</span>
+
+    </div>
+
+    <div class="row_div pass_div1 comment_block">
+
+        <div>
+
+            <b>
+        
+                Дополнительные примечания студента:
+
+            </b>
+        
+        </div>
+
+        <span class="additional_comment">{% if history_verification.additional_comment_student %}{{history_verification.additional_comment_student}}{% else %}Комментария нет!{% endif %}</span>
+
+    </div>
+
+{% endblock content %}
+
+{% block javascript %}
+
+    <!-- Import script toggle button -->
+
+	<script type="text/javascript" src="{% static 'js/multiple_file.js' %}"></script>
+
+	<!-- Import table scripts -->
+
+	<script type="text/javascript" src="{% static 'js/show_href_blocks.js' %}"></script>
+
+    <!-- Import script close message -->
+
+	<script type="text/javascript" src="{% static 'js/close_message.js' %}"></script>
+
+    <!-- Import script add comment verification.js -->
+
+	<script type="text/javascript">
+        var url_addres = "{% url 'teacherapp_works_verification_add_comment_url' verification.id  %}";
+        var url_delete_addres = "{% url 'teacherapp_works_verification_delete_comment_url' verification.id  %}";
+        var job_scale = "{{job.scale.dimension}}";
+        var function_toggle = null;
+        var general_classes = null;
+    </script>
+
+    <!-- Import script toggle button -->
+
+	<script type="text/javascript" src="{% static 'js/toggle_button.js' %}"></script>
+
+    <!-- Import color input script -->
+
+	<script type="text/javascript" src="{% static 'js/color_numberinputs.js' %}"></script>
+
+    <!-- Import script add comment verification.js -->
+
+	<script type="text/javascript" src="{% static 'teacherapp/js/add_comment_verification.js' %}"></script>
+
+{% endblock javascript %}

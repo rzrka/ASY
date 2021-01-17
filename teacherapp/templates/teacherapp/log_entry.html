@@ -1,0 +1,21 @@
+{% extends 'teacherapp/teacher_base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+	{% include 'teacherapp/includes/log_entry_main.html' %}
+
+{% endblock content %}
+
+{% block javascript %}
+
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    
+	<script type="text/javascript">
+        let url_addres = "{% url 'teacherapp_index_url' %}"
+	</script>
+
+    <script type="text/javascript" src="{% static 'teacherapp\js\log_entry.js' %}"></script>
+
+{% endblock javascript %}

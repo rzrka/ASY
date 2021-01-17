@@ -1,0 +1,133 @@
+{% extends 'studentapp/job_detail.html' %}
+
+{% load static %}
+
+{% load django_bootstrap_breadcrumbs %}
+
+{% load teacherapp_extras %}
+
+{% block style %}
+
+    <link rel="stylesheet" type="text/css" href="{% static 'css/new_info.css' %}">
+
+{% endblock style %}
+
+{% block breadcrumbs %}
+
+	{{ block.super }}
+
+    {% breadcrumb "История" 'student_job_history_list_url' semester.id discipline.id job.id %}
+
+{% endblock %}
+
+{% block content %}
+
+    {% include 'teacherapp/includes/form-messages_errors.html' %}
+
+    <div class="row_div flex_div">
+			
+        <div class="list-div list schedule_lessonsList_Listdiv schedule_teacherPage_Listdiv">
+
+            <div class="list-item list-title">История проверки работ</div>
+
+            <div class="list-item subtitle cursor-normal">
+
+                <span>
+
+                    №
+
+                </span>
+
+                <span>
+
+                    Дата проверки 
+
+                </span>
+
+                <span>
+
+                    Оценка
+
+                </span>
+
+                <span>
+
+                    Дополнительные примечания
+
+                </span>
+
+            </div>
+
+            {% if teleworks %}
+
+                <div class="list-item-content list-item-color-content">
+
+                    {% for telework in teleworks %}
+
+                        {% with telework.tele_work_criterions.all|get_unchecked_student_comments as teacher_comments %}
+
+                            <a href="{% url 'student_job_history_detail_url' semester.id discipline.id job.id telework.id %}" class="list-item {% if teacher_comments %}before-info{% endif %}">
+
+                                <span class="info_relative">
+                                
+                                    {{forloop.counter}}
+
+                                </span>
+
+                                <span class="colored-item">
+                                    
+                                    {{telework.check_date|date:"d.m.Y, H:i"}}
+
+                                </span>
+
+                                <span class="span_color_grade" data-category="{% if telework.control_grade.controlwork.scale.dimension == 2 %}{{telework|grade_attendance_offset_grade}}{% elif telework.control_grade.controlwork.scale.dimension == 5 %}{{telework.grade}}{% else %}{{telework|get_normal_grade_verification}}{% endif %}">
+                                    
+                                    {{telework.grade}}{% if telework.control_grade.controlwork.scale.dimension == 100 %}%{% else %}/{{telework.control_grade.controlwork.scale.dimension}}{% endif %}
+
+                                </span>
+
+                                <span>
+
+                                    {% if telework.additional_comment %}
+                                    
+                                        {{telework.additional_comment|truncatewords:15}}
+                                    
+                                    {% else %}
+                                    
+                                        -
+                                    
+                                    {% endif %}
+
+                                </span>
+
+                            </a>
+
+                        {% endwith %}
+
+                    {% endfor %}
+                    
+                </div>
+
+            {% else %}
+
+                <div class="list-item">
+
+                    Список работ пуст!
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+{% endblock content %}
+
+{% block javascript %}
+
+    <!-- Import script close message -->
+
+	<script type="text/javascript" src="{% static 'js/close_message.js' %}"></script>
+
+{% endblock javascript %}

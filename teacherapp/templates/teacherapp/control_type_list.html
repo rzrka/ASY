@@ -1,0 +1,208 @@
+{% extends 'teacherapp/schedule_detail.html' %}
+
+{% load static %}
+
+{% load django_bootstrap_breadcrumbs %}
+
+{% block breadcrumbs %}
+
+	{{ block.super }}
+
+	{% breadcrumb 'Контроль' 'teacherapp_control_type_list_url' schedule.id %}
+
+{% endblock %}
+
+{% load teacherapp_extras %}
+
+{% block content %}
+
+    {% include 'teacherapp/includes/form-messages_errors.html' %}
+
+    <form class="flex_div_horizontal" action="{% url 'teacherapp_control_type_list_url' schedule.id %}" method="post">
+        
+        {% csrf_token %}
+
+        <div class="row_div flex_div flex_div_vertical">
+
+            <div class="list-div list schedule_teacherPage_Listdiv schedule_lessonsList_Listdiv control_types_Listdiv">
+
+                <div class="list-item list-title">Виды контроля</div>
+
+                <div href="#" class="list-item subtitle cursor-normal">
+
+                    <span>
+
+                        №
+
+                    </span>
+
+                    <span>
+
+                        Тема 
+
+                    </span>
+
+                    <span>
+
+                        Вес
+
+                    </span>
+
+                    <span>
+
+                        Вес (норм.), %
+
+                    </span>
+
+                </div>
+
+                <div class="list-item-content">
+
+                    {% for controltype in controltypes %}
+
+                        <div class="list-item group_name href-block-relative">
+
+                            <span>
+
+                                {{controltype}}
+                                
+                            </span>
+
+                            <a href="{{controltype.get_absolute_url}}" class="href-block left-top-href-block top_group_name">
+                            
+                                Редактировать настройки
+                            
+                            </a>
+
+                            <a href="{% url 'teacherapp_control_type_write_url' schedule.id controltype.id %}" class="href-block right-top-href-block top_group_name">
+                            
+                                Заполнить данные
+                            
+                            </a>
+
+                        </div>
+
+                        {% for control_work in controltype.control_works.all|dictsort:"work_number" %}
+                        
+                            <div class="list-item calculate-list-item href-block-relative">
+
+                                <span>
+                                    
+                                    {{control_work.work_number}}
+
+                                </span>
+
+                                <span>
+                                    
+                                    {{control_work.name|truncatewords:5}} 
+
+                                </span>
+
+                                <span class="weight">
+
+                                    {% for field in workweights|get_item:control_work.id %}
+                                    
+                                        {{field}}
+                                    
+                                    {% endfor %} 
+
+                                </span>
+
+                                <span class="weight_norm">
+
+
+                                </span>
+
+                                <a href="{{control_work.get_absolute_url}}" class="href-block left-top-href-block">
+
+                                    Редактировать настройки
+
+                                </a>
+
+                                <a href="{% url 'teacherapp_job_write_url' schedule.id controltype.id control_work.id %}" class="href-block right-top-href-block">
+
+                                    Заполнить данные
+
+                                </a>
+
+                            </div>
+                        
+                        {% endfor %}
+                    
+                    {% empty %}
+                    
+                        <div class="list-item group_name href-block-relative">
+
+                            <span>
+
+                                Список работ пуст!
+
+                            </span>
+
+                        </div>
+                    
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="row_div flex_div flex_horizontal_align">
+            
+            <a href="{% url 'teacherapp_control_type_create_url' schedule.id %}" class="btn sircle_btn little_button">
+            
+                Добавить вид контроля
+                
+            </a>
+
+            <button type="submit" class="btn sircle_btn little_button save_div">
+
+                <img src="{% static 'img/save-20.png' %}" title="Сохранить" alt="Сохранить">
+
+            </button>
+
+        </div>
+        
+    </form>
+
+    <div class="row_div flex_div">
+
+        {% include 'teacherapp/includes/certification_list_include.html' %}
+
+    </div>
+
+    <div class="row_div flex_div flex_horizontal_align">
+        
+        <a href="{% url 'teacherapp_certification_create_url' schedule.id %}" class="btn sircle_btn little_button">
+        
+            Добавить аттестацию
+        
+        </a>
+
+        <a href="{% url 'teacherapp_certification_list_url' schedule.id %}" class="btn sircle_btn little_button btn_secondary">
+		
+			Список аттестаций
+		
+		</a>
+
+    </div>
+
+{% endblock content %}
+
+{% block javascript %}
+
+    <!-- Import table scripts -->
+
+	<script type="text/javascript" src="{% static 'teacherapp/js/control_work_wight_calculate.js' %}"></script>
+
+	<!-- Import table scripts -->
+
+	<script type="text/javascript" src="{% static 'js/show_href_blocks.js' %}"></script>
+
+    <!-- Import script close message -->
+
+	<script type="text/javascript" src="{% static 'js/close_message.js' %}"></script>
+
+{% endblock javascript %}

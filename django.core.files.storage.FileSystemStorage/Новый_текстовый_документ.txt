@@ -1,0 +1,59 @@
+#include <iostream>
+#include <cmath>
+#include <iomanip>
+#include <algorithm>
+#include <bitset>
+#include <vector>
+#include <list>
+
+using namespace std;
+
+long long n, m, q;
+const long long inf = 1e18;
+vector <bool> used(20005,false);
+vector <pair<long long, long long>> pairs(20005);
+vector <vector<pair<long long, long long>>> dp(20005);
+vector <long long> rez;
+
+void ffs(long long v) {
+	if (!used[v])
+	{
+		used[v] = true;
+		for (pair<long long, long long> u : dp[v])
+		{
+			if (used[u.first])
+			{
+				continue;
+			}
+			rez.push_back(u.second);
+			ffs(u.first);
+		}
+	}
+}
+
+int main()
+{
+	ios_base::sync_with_stdio(0);
+	cin.tie(0);
+
+	
+	cin >> n >> m;
+	for (long long i = 1; i <= m; i++)
+	{
+		long long num1, num2;
+		cin >> num1 >> num2;
+		dp[num1].push_back({ num2,i });
+		dp[num2].push_back({ num1,i });
+		pairs[i] = { num1 ,num2};
+	}
+
+	cin >> q;
+	for (long long i = 1; i <= q; i++)
+	{
+		long long num;
+		cin >> num;
+		long long num1 = pairs[i].first;
+
+	}
+	return 0;
+}

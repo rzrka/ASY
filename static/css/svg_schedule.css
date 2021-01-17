@@ -1,0 +1,14 @@
+.svg_hourglass {
+    position: absolute;
+    right: -18px !important;
+    margin: auto;
+    color: #fff;
+}
+
+span.svg_hourglass_relative .svg_hourglass {
+    right: 5px !important;
+}
+
+.svg_hourglass_relative {
+    position: relative;
+}

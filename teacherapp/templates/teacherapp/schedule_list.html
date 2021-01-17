@@ -1,0 +1,101 @@
+{% extends 'teacherapp/teacher_base.html' %}
+
+{% load django_bootstrap_breadcrumbs %}
+
+{% block breadcrumbs %}
+
+	{{ block.super }}
+
+	{% breadcrumb "Журналы" 'teacherapp_schedule_list_url' %}
+
+{% endblock %}
+
+{% block content %}
+
+	<div class="row_div flex_div">
+			
+			<div class="list-div list schedule_teacherPage_Listdiv">
+
+				<div class="list-item list-title">Журналы</div>
+
+				<div class="list-item subtitle cursor-normal">
+
+					<span>
+
+						Семестр
+
+					</span>
+
+					<span>
+
+						Дисциплина 
+
+					</span>
+
+					<span>
+
+						Группа
+
+					</span>
+
+					<span>
+
+						Учебное заведение
+
+					</span>
+
+				</div>
+
+				{% if schedules %}
+
+					<div class="list-item-content">
+
+						{% for schedule in schedules %}
+						
+							<a href="{{schedule.get_absolute_url}}" class="list-item">
+
+							<span>
+							
+								{{schedule.semester}}
+
+							</span>
+
+							<span>
+								
+								{{schedule.discipline}}
+
+							</span>
+
+							<span>
+								
+								{{schedule.studentgroup}}
+
+							</span>
+
+							<span>
+								
+								{{schedule.studentgroup.educationalestablishment.abbreviation}}
+
+							</span>
+							
+							</a>
+
+						{% endfor %}
+						
+					</div>
+
+				{% else %}
+
+					<div class="list-item">
+
+						Таблица пуста!
+
+					</div>
+
+				{% endif %}
+
+			</div>
+
+		</div>
+
+{% endblock content %}

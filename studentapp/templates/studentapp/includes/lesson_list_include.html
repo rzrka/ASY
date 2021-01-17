@@ -1,0 +1,93 @@
+{% load teacherapp_extras %}
+
+<div class="row_div flex_div">
+        
+    <div class="list-div list schedule_teacherPage_Listdiv schedule_Attendance_StudentDiv">
+
+        {% comment %} <div class="list-item list-title">Аттестации</div> {% endcomment %}
+
+        <div href="#" class="list-item subtitle cursor-normal">
+
+            <span>
+
+                №
+
+            </span>
+
+            <span>
+
+                Дата 
+
+            </span>
+
+            <span>
+
+                Вид занятий
+
+            </span>
+
+                <span>
+
+                Посещаемость
+
+            </span>
+
+                <span>
+
+                Тема
+
+            </span>
+
+        </div>
+
+        <div class="list-item-content ">
+
+            {% for lesson in schedule.auditoryLessons.all|dictsort:"lessons_number" %}
+
+                <a href="{% url 'student_lesson_detail_url' semester.id discipline.id lesson.id %}" class="list-item">
+
+                    <span>{{lesson.lessons_number}}</span>
+
+                    <span>{{lesson.date|date:"d.m.Y"}}</span>
+
+                    <span>{{lesson.type_employment}}</span>
+
+                    <span>
+
+                        {% with attendance|get_item:lesson.id as grade %}
+
+                            <div data-category="{{grade}}">
+
+                                {{grade.get_grade_display}} 
+
+                                {% with grade|unread_comments:user as comments %}
+
+                                    {% if comments %}(+{{comments|length}}){% endif %}
+                                
+                                {% endwith %}
+
+                            </div>
+                        
+                        {% endwith %}
+                    
+                    </span>
+
+                    <span>{{lesson.theme}}</span>
+
+                </a>
+            
+            {% empty %}
+
+                <div class="list-item-content">
+
+                    Список аудиторных занятий пуст!
+
+                </div>
+                
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</div>

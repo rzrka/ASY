@@ -1,0 +1,69 @@
+{% extends 'studentapp/student_base.html' %}
+
+{% load static %}
+
+{% load django_bootstrap_breadcrumbs %}
+
+{% block breadcrumbs %}
+
+	{{ block.super }}
+
+{% endblock %}
+
+{% block content %}
+
+    <div class="row_div flex_div flex_div_vertical">
+
+        <div class="list-div list main_teacherPage_Listdiv main_studentPage_Listdiv">
+
+            <div class="list-item list-title">
+            
+                Семестры
+
+            </div>
+
+            <div class="list-item-content">
+
+            {% if semesters %}
+
+                {% for object in semesters %}
+
+                    <a href="{% url 'student_discipline_list_url' object.id %}" class="list-item ajax-item">
+                        {{object}}
+                    </a>
+
+                {% endfor %}
+
+                {% else %}
+
+                <div class="list-item">
+
+                    Таблица пуста!
+
+                </div>
+
+            {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+{% endblock content %}
+
+{% block javascript %}
+
+    <!-- Import script close message -->
+
+	<script type="text/javascript" src="{% static 'js/close_message.js' %}"></script>
+
+	<!-- Import table scripts -->
+
+	<script type="text/javascript" src="{% static 'teacherapp/js/control_work_wight_calculate.js' %}"></script>
+
+	<!-- Import table scripts -->
+
+	<script type="text/javascript" src="{% static 'js/show_href_blocks.js' %}"></script>
+
+{% endblock javascript %}

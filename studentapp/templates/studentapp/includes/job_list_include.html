@@ -1,0 +1,181 @@
+{% load teacherapp_extras %}
+
+{% load static %}
+
+<div class="row_div flex_div">
+        
+    <div class="list-div list schedule_teacherPage_Listdiv schedule_Grades_StudentDiv">
+
+        <div class="list-item subtitle cursor-normal">
+
+            <span>
+
+                №
+
+            </span>
+
+            <span>
+
+                Тема работы 
+
+            </span>
+
+            <span>
+
+                Статус работы
+
+            </span>
+
+                <span>
+
+                Оценка
+
+            </span>
+
+        </div>
+
+        <div class="list-item-content">
+
+            {% for control_type in schedule.control_types.all|dictsort:"name" %}
+            
+                <div class="list-item group_name href-block-relative cursor-normal">
+
+                    <span>
+
+                        {{control_type}}
+                        
+                    </span>
+
+                </div>
+
+                {% for control_work in control_type.control_works.all|dictsort:"work_number" %}
+
+                {% comment %} Если "Дистанционная проверка работ" равна False (нет Дистанционной проверки работ) {% endcomment %}
+                
+                    <a href="
+                    {% if control_work.control_type.distance_work_check is True %}
+
+                    {% url 'student_job_detail_url' semester.id discipline.id control_work.id %} 
+
+                    {% else %}
+
+                        #
+                        
+                    {% endif %}
+                    
+                    " class="list-item {% if control_work.control_type.distance_work_check is False %}cursor-normal{% endif %}">
+
+                        <span>
+
+                            {{control_work.work_number}}
+
+                        </span>
+
+                        <span>
+
+                            {{control_work.name}} 
+
+                        </span>
+
+                        {% with control_work.control_work_grades.all|get_by_student:student as grade %}
+
+                            <span class="svg_hourglass_relative">
+
+                                {% if grade.status|get_tuple == grade.STATUS_VARIANTS.1.0 or grade.status|get_tuple == grade.STATUS_VARIANTS.3.0 %}
+
+                                    {{grade.status|get_tuple|n_replace:grade.tele_works.all.count}}
+
+                                {% else %}
+
+                                    {{grade.status|get_tuple}}
+                                
+                                {% endif %}
+
+                                {% with grade|unchecked_works as works %}
+                                
+                                    {% if works %}
+                                
+                                        <img
+                                            class="svg_hourglass"
+                                            src="{% static 'svg/hourglass_empty-black-18dp.svg' %}"
+                                            alt="hourglass">
+                                    
+                                    {% endif %}
+                                
+                                {% endwith %}
+
+                            </span>
+
+                            <span class="grade_student">
+
+                                {% if grade.controlwork.scale.dimension == 5 %}
+
+                                    <div data-category="{{grade}}">
+                                    
+                                        {{grade}}
+
+                                    </div>
+                                    
+                                {% elif grade.controlwork.scale.dimension == 2 %}
+
+                                    <div data-category="{{grade|grade_attendance_offset_grade}}">
+
+                                        {{grade|grade_attendance_offset}}
+
+                                    </div>
+                                
+                                {% else %}
+
+                                    <div class="half_span_relative" data-category="{{grade|get_normal_grade}}">
+
+                                        <span class="half_span">
+
+                                            {{grade}}
+                                        
+                                                {% if grade.controlwork.scale.dimension == 100 %}
+                                            
+                                                %
+                                                    
+                                            {% else %}
+                                        
+                                                / 
+                                            
+                                                {{grade.controlwork.scale.dimension}}
+                                        
+                                            {% endif %}  
+
+                                        </span>
+
+                                        <span class="half_span">
+
+                                            {{grade|get_normal_grade}}
+
+                                        </span>
+
+                                    </div>
+
+                                {% endif %}
+
+                            </span>
+
+                        {% endwith %}
+
+                    </a>
+                
+                {% endfor %}
+            
+            {% empty %}
+
+                <div class="list-item group_name href-block-relative cursor-normal">
+
+                    Список контроля пуст!
+
+                </div>
+            
+            {% endfor %}
+
+        </div>
+    
+    </div>
+
+</div>

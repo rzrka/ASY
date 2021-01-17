@@ -1,0 +1,203 @@
+{% extends 'studentapp/discipline_list.html' %}
+
+{% load static %}
+
+{% load django_bootstrap_breadcrumbs %}
+
+{% load teacherapp_extras %}
+
+{% block style %}
+
+	<link rel="stylesheet" type="text/css" href="{% static 'css/beautiful_grade.css' %}">
+
+	<link rel="stylesheet" type="text/css" href="{% static 'css/svg_schedule.css' %}">
+
+{% endblock style %}
+
+{% block breadcrumbs %}
+
+	{{ block.super }}
+
+    {% breadcrumb discipline 'student_schedule_detail_url' semester.id discipline.id %}
+
+{% endblock %}
+
+{% block content %}
+
+	<div class="row_div">
+
+		<div class="document_title">
+
+			<h3>
+
+				Посещаемость аудиторных занятий
+
+			</h3>
+
+			<a class="btn sircle_btn btn_secondary float-right little_button" href="{% url 'student_lesson_list_url' semester.id discipline.id %}">
+
+				Перечень занятий
+
+			</a>
+
+		</div>
+
+	</div>
+
+	{% include 'teacherapp/includes/form-messages_errors.html' %}
+
+	{% include 'studentapp/includes/lesson_list_include.html' %}
+
+	<div class="row_div pass_div">
+
+		Пропусков (без уважительной причины): <span data-category="{{skips.1}}">{{skips.0}}</span>
+
+	</div>
+
+	<div class="row_div pass_div">
+
+		Пропусков (всего): <span data-category="{{normal_skips.1}}">{{normal_skips.0}}</span>
+
+	</div>
+
+	<div class="row_div">
+
+		<div class="document_title">
+
+			<h3>
+
+				Контроль знаний и навыков
+
+			</h3>
+			
+			<a class="btn sircle_btn btn_secondary float-right little_button" href="{% url 'student_job_list_url' semester.id discipline.id %}">
+
+				Перечень работ
+
+			</a>
+
+		</div>
+
+	</div>
+
+	{% include 'studentapp/includes/job_list_include.html' %}
+
+	<div class="row_div">
+
+		<div class="document_title">
+
+			<h3>
+
+				Результаты аттестации
+
+			</h3>
+
+		</div>
+
+	</div>
+
+	<div class="row_div flex_div">
+        
+        <div class="list-div list schedule_teacherPage_Listdiv schedule_Grades_StudentDiv">
+
+            <div class="list-item subtitle cursor-normal">
+
+                <span>
+
+                    №
+
+                </span>
+
+                <span>
+
+                    Название 
+
+                </span>
+
+                <span>
+
+                    Вид
+
+                </span>
+
+				 <span>
+
+                    Оценка
+
+                </span>
+
+            </div>
+
+			<div class="list-item-content">
+			
+				{% for certification in schedule.certifications.all|dictsort:"number" %}
+			
+					<div class="list-item cursor-normal">
+
+						<span>
+
+							{{certification.number}}
+
+						</span>
+
+						<span>
+
+							{{certification.name}}
+
+						</span>
+
+						<span>
+
+							{{certification.get_type_display|remove_word:"аттестация"}}
+
+						</span>
+
+						<span class="grade_student">
+
+							{% with certification.certification_control_work_grades|get_grade_from_queryset:student as grade %}
+							
+								<div data-category="{{grade}}">
+
+									{{grade}}
+
+								</div>
+							
+							{% endwith %}
+
+						</span>
+
+					</div>
+				
+				{% empty %}
+
+					<div class="list-item group_name href-block-relative cursor-normal">
+
+						Список аттестаций пуст!
+
+					</div>
+				
+				{% endfor %}
+
+			</div>
+
+		</div>
+
+	</div>
+
+{% endblock content %}
+
+{% block javascript %}
+
+    <!-- Import script close message -->
+
+	<script type="text/javascript" src="{% static 'js/close_message.js' %}"></script>
+
+	<!-- Import table scripts -->
+
+	<script type="text/javascript" src="{% static 'teacherapp/js/control_work_wight_calculate.js' %}"></script>
+
+	<!-- Import table scripts -->
+
+	<script type="text/javascript" src="{% static 'js/show_href_blocks.js' %}"></script>
+
+{% endblock javascript %}

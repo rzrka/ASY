@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block version %}
+    Личный кабинет преподавателя
+{% endblock version %}
+
+{% block user_menu %}
+    {{ block.super }}
+    
+    <li>
+
+        <a href="{% url 'teacherapp_works_verification_url' %}">Дистанционная проверка работ</a>
+
+    </li>
+    
+{% endblock user_menu %}

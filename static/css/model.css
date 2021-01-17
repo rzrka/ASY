@@ -1,0 +1,130 @@
+.iframe {
+    background: #fff;
+    border-radius: 4px;
+    box-shadow: 1px 7px 20px 2px rgba(0, 0, 0, .4);
+    height: 650px;
+    left: 50%;
+    overflow: hidden;
+    position: fixed;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 850px;
+    z-index: 111;
+}
+
+.iframe-delete {
+    width: 650px;
+    height: 200px;
+}
+
+.iframe-delete {
+    width: 650px;
+    height: 200px;
+}
+
+.iframe-add_comment {
+    width: 650px;
+    height: auto;
+    padding: 10px 20px;
+}
+
+.iframe iframe {
+    width: 100%;
+    height: 100%;
+}
+
+.iframe-add_comment .iframe-row {
+    display: flex;
+}
+
+.iframe-row {
+    position: relative;
+    width: 100%;
+}
+
+.iframe-row:not(:first-child) {
+    margin-top: 10px;
+}
+
+.iframe-row button,
+.iframe-row a {
+    width: 150px !important;
+    display: inline-block;
+}
+
+.iframe-row .input_table tr {
+    height: 80px;
+}
+
+.iframe-btn-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+}
+
+.ifame-close {
+    width: 32px;
+    height: 32px;
+    opacity: 0.3;
+}
+
+.ifame-close:hover {
+    opacity: 1;
+}
+
+.ifame-close:before,
+.ifame-close:after {
+    position: absolute;
+    bottom: 0px;
+    left: 15px;
+    content: '';
+    height: 33px;
+    width: 2px;
+    background-color: #333;
+}
+
+.ifame-close:before {
+    transform: rotate(45deg);
+}
+
+.ifame-close:after {
+    transform: rotate(-45deg);
+}
+
+.delete_title * {
+    display: inline-block;
+    padding: 7px 15px;
+    color: var(--header-color);
+    margin: none;
+}
+
+.form_delete {
+    background-color: #fff;
+    text-align: center;
+    height: 100vh;
+}
+
+.form_add_comment {
+    text-align: center;
+    height: 100% !important;
+}
+
+.btn_delete_primary {
+    background-color: var(--light-red);
+    color: #fff;
+}
+
+.btn_delete_primary:hover {
+    color: var(--light-red);
+    background-color: #fff;
+}
+
+.display_none {
+    display: none;
+}
+
+#save_comment {
+    margin-top: 20px !important;
+}

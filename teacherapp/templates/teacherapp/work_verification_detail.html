@@ -1,0 +1,296 @@
+{% extends 'teacherapp/work_verification.html' %}
+
+{% load static %}
+
+{% load django_bootstrap_breadcrumbs %}
+
+{% load teacherapp_extras %}
+
+{% block style %}
+
+    <link rel="stylesheet" type="text/css" href="{% static 'css/new_info.css' %}">
+
+    <!-- Import model styles -->
+
+	<link rel="stylesheet" type="text/css" href="{% static 'css/model.css' %}">
+
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+{% endblock style %}
+
+{% block breadcrumbs %}
+
+	{{ block.super }}
+
+	{% breadcrumb 'Проверка работы' 'teacherapp_works_verification_detail_url' verification.id %}
+
+{% endblock %}
+
+{% block content %}
+
+    {% with verification|get_unchecked_student_comments_job as comments %}
+
+        <div class="row_div">
+
+            <div class="document_title">
+                
+                <h3>
+                    
+                    Проверка работы
+
+                </h3>
+
+            </div>
+
+        </div>
+
+        {% include 'teacherapp/includes/form-messages_errors.html' %}
+
+        <div class="row_div">
+
+            {% include 'teacherapp/includes/verification_info.html' %}
+
+        </div>
+
+        <form action="{% url 'teacherapp_works_verification_detail_url' verification.id %}" method="post">
+
+            {% csrf_token %}
+
+            <div class="row_div">
+
+                <div class="document_title">
+                    
+                    <h3>
+                        
+                        Критерии оценки:
+
+                    </h3>
+
+                    <a href="{% url 'teacherapp_works_verification_history_url' verification.id %}" class="btn sircle_btn btn_secondary float-right little_button {% if comments %}before-info{% endif %}">
+                    
+                        История проверки работы
+                        
+                    </a>
+
+                </div>
+
+            </div>
+
+            <div class="row_div flex_div flex_div_vertical">
+
+                <div class="list-div list schedule_teacherPage_Listdiv work_werification_listDiv">
+
+                    <div href="#" class="list-item subtitle cursor-normal">
+
+                        <span>
+
+                            Критерий
+
+                        </span>
+
+                        <span>
+
+                            Оценка 
+
+                        </span>
+
+                        <span>
+
+                            Замечание/примечание
+
+                        </span>
+
+                    </div>
+
+                    <div class="list-item-content">
+
+                        {% for verification_criterion in verification|general_criterions %}
+                        
+                            {% with verification_criterion as include_criterion %}
+                            
+                                {% include 'teacherapp/includes/verification_criterion.html' %}
+                            
+                            {% endwith %}
+
+                            <div class="subcriterions">
+                            
+                                {% for verification_subcriterion in verification_criterion|subcriterions:verification %}
+                            
+                                    {% with verification_subcriterion as include_criterion %}
+
+                                        {% with verification_criterion as is_subcriterion %}
+                                        
+                                            {% include 'teacherapp/includes/verification_criterion.html' %}
+                                        
+                                        {% endwith %}
+                                    
+                                    {% endwith %}
+                                
+                                {% endfor %}
+                            
+                            </div>
+                            
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="row_div pass_div color_numberinput_grade" data-scale="{{job.scale.dimension}}">
+
+                Степень выполнения работы:
+
+                {% if job.scale.dimension == 2 or job.scale.dimension == 5 %}
+
+                    {{grade_form.visible_fields.0}}
+
+                {% else %}
+
+                    {% for field in grade_form.visible_fields.0 %}
+                
+                        {{field}}
+                    
+                    {% endfor %} 
+
+                {% endif %}
+
+            </div>
+
+            <div class="row_div pass_div1">
+
+                <div>
+                
+                    Дополнительные примечания:
+                
+                </div>
+
+                {{grade_form.visible_fields.1}}
+
+            </div>
+
+            <div class="row_div flex_div flex_div_vertical">
+
+                <div class="flex_div flex_horizontal_align">
+
+                    <button type="submit" name="offset" class="btn sircle_btn little_button">
+                    
+                        Работа зачтена
+                    
+                    </button>
+
+                    <button type="submit" name="change" class="btn sircle_btn little_button">
+                
+                        Вернуть на доработку
+                    
+                    </button>
+
+                </div>
+
+                <a href="{% url 'teacherapp_works_verification_history_url' verification.id %}" class="btn sircle_btn btn_secondary little_button {% if comments %}before-info{% endif %}">
+
+                    История проверки работы
+
+                </a>
+
+            </div>
+
+        </form>
+
+
+        <div id="add_comment" class="iframe iframe-add_comment display_none">
+
+            <div class="delete_title">
+                    
+                <h4>
+                    
+                    Замечание
+
+                </h4>
+
+            </div>
+
+            <div class="iframe-row">
+
+                {% for hidden in iframe_form.hidden_fields %}
+                    {{ hidden }}
+                {% endfor %}
+
+                <table class="input_table">
+
+                    <tbody>
+
+                        {% for field in iframe_form.visible_fields %}
+
+                            <tr>
+
+                                <th><label>{{field.label}}</label></th>
+
+                                <td>{{field}}</td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+            
+            <div class="iframe-row">
+
+                <button id="save_comment" class="btn little_button">Сохранить замечание</button>
+
+            </div>
+
+            <button class="iframe-btn-close ifame-close iframe-element-close"></button>
+
+        </div>
+    
+    {% endwith %}
+
+{% endblock content %}
+
+{% block javascript %}
+
+    <!-- Import script toggle button -->
+
+	<script type="text/javascript" src="{% static 'js/multiple_file.js' %}"></script>
+
+	<!-- Import table scripts -->
+
+	<script type="text/javascript" src="{% static 'js/show_href_blocks.js' %}"></script>
+
+    <!-- Import script close message -->
+
+	<script type="text/javascript" src="{% static 'js/close_message.js' %}"></script>
+
+    <!-- Import script add comment verification.js -->
+
+	<script type="text/javascript">
+        var url_addres = "{% url 'teacherapp_works_verification_add_comment_url' verification.id  %}";
+        var url_delete_addres = "{% url 'teacherapp_works_verification_delete_comment_url' verification.id  %}";
+        var job_scale = "{{job.scale.dimension}}";
+        var function_toggle = null;
+        var general_classes = null;
+    </script>
+
+    <!-- Import script toggle button -->
+
+	<script type="text/javascript" src="{% static 'js/toggle_button.js' %}"></script>
+
+    <!-- Import color input script -->
+
+	<script type="text/javascript" src="{% static 'js/color_numberinputs.js' %}"></script>
+
+    <!-- Import script add comment verification.js -->
+
+	<script type="text/javascript" src="{% static 'teacherapp/js/add_comment_verification.js' %}"></script>
+
+    <!-- Import script model window -->
+
+	<script type="text/javascript" src="{% static 'js/model.js' %}"></script>
+
+{% endblock javascript %}

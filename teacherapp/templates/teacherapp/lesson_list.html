@@ -1,0 +1,115 @@
+{% extends 'teacherapp/schedule_detail.html' %}
+
+{% load django_bootstrap_breadcrumbs %}
+
+{% block breadcrumbs %}
+
+	{{ block.super }}
+
+	{% breadcrumb "Занятия" 'teacherapp_schedule_lessonsList_url' schedule.id %}
+
+{% endblock %}
+
+{% block content %}
+
+    <div class="row_div flex_div">
+			
+        <div class="list-div list schedule_lessonsList_Listdiv schedule_teacherPage_Listdiv">
+
+            <div class="list-item list-title">Аудиторные занятия</div>
+
+            <div class="list-item subtitle cursor-normal">
+
+                <span>
+
+                    №
+
+                </span>
+
+                <span>
+
+                    Дата 
+
+                </span>
+
+                <span>
+
+                    Вид занятия
+
+                </span>
+
+                <span>
+
+                    Тема
+
+                </span>
+
+            </div>
+
+            {% if lessons %}
+
+                <div class="list-item-content">
+
+                    {% for lesson in lessons %}
+                    
+                        <a href="{{lesson.get_absolute_url}}" class="list-item">
+
+                            <span>
+                            
+                            {{lesson.lessons_number}}
+
+                            </span>
+
+                            <span>
+                                
+                                {{lesson.date|date:"d.m.Y"}}
+
+                            </span>
+
+                            <span>
+                                
+                                {{lesson.type_employment}}
+
+                            </span>
+
+                            <span>
+                                
+                                {% if lesson.theme %}
+
+                                    {{lesson.theme|truncatewords:10}}
+                                
+                                {% else %}
+                                
+                                    Без темы
+                                
+                                {% endif %}
+
+                            </span>
+                        
+                        </a>
+
+                    {% endfor %}
+                    
+                </div>
+
+            {% else %}
+
+                <div class="list-item">
+
+                    Таблица пуста!
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    <div class="row_div flex_div flex_div_vertical">
+
+			<a class="btn sircle_btn little_button"  href="{% url 'teacherapp_lesson_create_url' schedule.id %}">Добавить новое занятие</a>
+
+	</div>
+
+{% endblock content %}

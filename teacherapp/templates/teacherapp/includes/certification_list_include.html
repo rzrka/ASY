@@ -1,0 +1,83 @@
+{% load teacherapp_extras %}
+
+<div class="list-div list schedule_teacherPage_Listdiv certification_Listdiv">
+
+    <div class="list-item list-title">Аттестации</div>
+
+    <div class="list-item subtitle cursor-normal">
+
+        <span>
+
+            №
+
+        </span>
+
+        <span>
+
+            Название 
+
+        </span>
+
+        <span>
+
+            Вид
+
+        </span>
+
+    </div>
+
+    <div class="list-item-content">
+
+        {% for certification in certifications %}
+        
+            <div class="list-item href-block-relative">
+
+                <span>
+                    
+                    {{certification.number}}
+
+                </span>
+
+                <span>
+                    
+                    {{certification.name}} 
+
+                </span>
+
+                <span>
+                    
+                    {{certification.type|remove_word:"аттестация"}}
+
+                </span>
+
+                <a href="{{certification.get_absolute_url}}" class="href-block left-top-href-block">
+
+                    Редактировать настройки
+
+                </a>
+
+                <a href="{% url 'teacherapp_certification_write_url' schedule.id certification.id %}" class="href-block right-top-href-block">
+
+                    Заполнить данные
+
+                </a>
+
+            </div>
+            
+        {% empty %}
+        
+            <div class="list-item group_name href-block-relative">
+
+                <span>
+
+                    Список аттестаций пуст!
+
+                </span>
+
+            </div>
+        
+        {% endfor %}
+
+    </div>
+
+</div>

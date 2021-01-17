@@ -1,0 +1,149 @@
+{% load static %}
+
+{% load django_bootstrap_breadcrumbs %}
+
+{% load i18n static %}
+
+<!DOCTYPE html>
+
+{% get_current_language as LANGUAGE_CODE %}{% get_current_language_bidi as LANGUAGE_BIDI %}
+
+<html lang="{{ LANGUAGE_CODE|default:"en-us" }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
+
+<head>
+
+	<title>ASY</title>
+
+	<meta charset="utf-8">
+
+	<!-- Import main styles -->
+
+	<link rel="stylesheet" type="text/css" href="{% static 'css/main_style.css' %}">
+
+	<!-- Import Roboto font -->
+
+	<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+
+	{% block style %}
+
+	{% endblock style %}
+
+</head>
+
+<body>
+
+	<a class="to_top" title="Наверх"><i></i></a>
+
+	<header>
+
+		<div class="logo" onclick="location.href='{% url 'mainapp_index_url' %}'">
+
+			ас "успеваемость студентов"
+
+			<br>
+
+			<span>
+				
+				{% block version %}{% endblock version %}
+
+			</span>
+			
+		</div>
+
+		<nav>
+			
+			<a href="{% url 'mainapp_index_url' %}">
+
+				Главная
+
+			</a>
+
+		</nav>
+
+		<!-- При прокрутке вниз - переносится в правый верхний угол (с быстрой анимацией) в кружок, будет как меню -->
+
+		<div class="block_user">
+
+			{{ user.get_full_name_initials  }}
+
+			<img src="{% static 'img/icon_user.png' %}"/>
+
+			<div class="block_user_menu">
+
+				<ul>
+
+					{% comment %} <li>
+
+						<a href="#">Профиль</a>
+
+					</li> {% endcomment %}
+
+					{% block user_menu %}
+
+						{% if user.is_staff %}
+
+							<li>
+
+								<a href="{% url 'admin:index' %}">Администрирование</a>
+
+							</li>
+
+						{% endif %}
+					
+					{% endblock user_menu %}
+
+					<li>
+
+						<a href="{% url 'mainapp_logout_url' %}">Выйти</a>
+
+					</li>
+
+				</ul>
+
+			</div>
+
+		</div>
+
+	</header>
+
+		{% block breadcrumbs %}
+
+			{% clear_breadcrumbs %}
+
+			{% breadcrumb "Home" 'mainapp_index_url' %}
+
+		{% endblock %}
+
+	{% render_breadcrumbs %}
+
+	<main>
+
+		{% block content %}
+		
+		{% endblock content %}
+
+	</main>
+
+	<!-- Import script button-top -->
+
+	<script type="text/javascript" src="{% static 'js/button_to_top.js' %}"></script>
+
+	<!-- Import script button-user -->
+
+	<script type="text/javascript" src="{% static 'js/user_icon_move.js' %}"></script>
+	
+	{% block javascript %}
+
+	{% endblock javascript %}
+
+	<!-- Import script multiple file choose -->
+
+	{% comment %} <script type="text/javascript" src="{% static 'js/multiple_file.js' %}"></script> {% endcomment %}
+
+	<!-- Import script toggle button -->
+
+	{% comment %} <script type="text/javascript" src="{% static 'js/toggle_button.js' %}"></script> {% endcomment %}
+
+</body>
+
+</html>

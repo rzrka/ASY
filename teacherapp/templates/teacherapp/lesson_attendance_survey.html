@@ -1,0 +1,99 @@
+{% extends 'teacherapp/lesson_detail_main.html' %}
+
+{% load static %}
+
+{% load django_bootstrap_breadcrumbs %}
+
+{% block breadcrumbs %}
+
+	{{ block.super }}
+    
+    {% breadcrumb "Опрос" 'teacherapp_lesson_attendance_survey_url' schedule.id lesson.id %}
+
+{% endblock %}
+
+{% block style %}
+
+    <!-- Import styles for slider -->
+
+	<link rel="stylesheet" type="text/css" href="{% static 'css/slider.css' %}">
+
+{% endblock style %}
+
+{% block content %}
+
+    <form method="post" action="{{auditorylessons.get_absolute_url}}">
+
+        {% csrf_token %}
+
+        <div class="slider_container">
+                
+            <div class="slider">
+
+                <div class="slider__wrapper">
+
+                    <div class="slider__items">
+
+                        {% for grade in grades %}
+
+                            <div class="slider__item list" {% ifequal grade grades|first %}active{% endifequal %}>
+
+                                <h5 class="list-item list-title">{{grade.instance.student.version_in_group}}. {{grade.instance.student.student.get_full_name}}</h5>
+
+                                {% for choise in grade.visible_fields.0|slice:":3" %}
+
+                                    <label class="btn sircle_btn btn_secondary btn_toggle" data-class="{{choise.choice_label}}" for="{{ choise.id_for_label  }}">
+                                    
+                                        {{ choise.tag }}
+
+                                        {{ choise.choice_label }}
+
+                                    </label>
+                                
+                                {% endfor %}
+
+                                <label class="btn sircle_btn btn_secondary btn_toggle btn-hidden" data-class="{{grade.visible_fields.0.3.choice_label}}" for="{{ grade.visible_fields.0.3.id_for_label  }}">
+                                    
+                                    {{ grade.visible_fields.0.3.tag }}
+
+                                    {{ grade.visible_fields.0.3.choice_label }}
+
+                                </label>
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+                <a class="slider__control slider__control_prev" href="#" role="button"></a>
+
+                <a class="slider__control slider__control_next slider__control_show" href="#" role="button"></a>
+
+            </div>
+
+        </div>
+
+        <div class="row_div flex_div flex_div_vertical">
+            
+            <button type="submit" class="btn sircle_btn little_button">Сохранить данные</button>
+
+        </div>
+
+    </form>
+
+{% endblock content %}
+
+{% block javascript %}
+
+    <!-- Import script toggle button -->
+
+	<script type="text/javascript" src="{% static 'js/toggle_button.js' %}"></script>
+
+    <!-- Import script slider -->
+
+	<script type="text/javascript" src="{% static 'js/slider.js' %}"></script>
+
+{% endblock javascript %}

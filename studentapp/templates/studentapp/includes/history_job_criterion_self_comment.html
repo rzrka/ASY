@@ -1,0 +1,25 @@
+{% if include_criterion.tele_work_criterion_comment_student.all %}
+
+    <div class="comment_block">
+
+        <div>
+
+            <b>
+    
+                Примечания студента:
+
+            </b>
+
+        </div>
+
+        {% for comment in include_criterion.tele_work_criterion_comment_student.all %}
+
+            <div data-comment_id="{{comment.id}}" class="colored_text_comment comment">{{comment}}<a class="comment_delete"></a></div>
+
+        {% endfor %}
+        
+    </div>
+
+{% endif %}
+
+<a class="simple-link" data-iframe="add_comment">Добавить примечание</a>

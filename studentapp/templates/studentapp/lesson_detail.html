@@ -1,0 +1,327 @@
+{% extends 'studentapp/lesson_list.html' %}
+
+{% load static %}
+
+{% load django_bootstrap_breadcrumbs %}
+
+{% load teacherapp_extras %}
+
+{% block breadcrumbs %}
+
+	{{ block.super }}
+
+    {% breadcrumb lesson.date|date:"d.m.Y" semester.id discipline.id lesson.id %}
+
+{% endblock %}
+
+{% block content %}
+
+    <div class="row_div">
+
+        <div class="document_title">
+            
+            <h3>
+                
+                Информация о занятии:
+
+            </h3>
+
+        </div>
+
+    </div>
+
+    {% include 'teacherapp/includes/form-messages_errors.html' %}
+
+    {% if form_comment.errors %}
+
+        <div class="row_div errors_div">
+
+            {% for field in form_comment %}
+
+                {% for error in field.errors %}
+
+                    <div class="error">
+                    
+                        (поле "{{field.label}}") {{error}}
+
+                        <span class="closebtn">&times;</span>
+
+                    </div>
+                
+                {% endfor %}
+            
+            {% endfor %}
+
+        </div>
+
+    {% endif %}
+
+    {% if form_file.errors %}
+
+        <div class="row_div errors_div">
+
+            {% for field in form_file %}
+
+                {% for error in field.errors %}
+
+                    <div class="error">
+                    
+                        (поле "{{field.label}}") {{error}}
+
+                        <span class="closebtn">&times;</span>
+
+                    </div>
+                
+                {% endfor %}
+            
+            {% endfor %}
+
+        </div>
+
+    {% endif %}
+
+    <form method="post" action="{% url 'student_lesson_detail_url' semester.id discipline.id lesson.id %}" enctype="multipart/form-data">
+
+        {% csrf_token %}
+
+        {% for field in form_comment.hidden_fields %}
+        
+            {{field}}
+        
+        {% endfor %}
+
+        {% for field in form_file.hidden_fields %}
+        
+            {{field}}
+        
+        {% endfor %}
+
+        <div class="row_div">
+
+            <table class="input_table">
+
+                <tbody>
+
+                    <tr>
+
+                        <th>Преподаватель</th>
+
+                        <td>
+
+                            <span class="">
+
+                                {{schedule.user.teacher.get_full_name}}
+
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <th>№ занятия</th>
+
+                        <td>
+
+                            <span class="">
+
+                                {{lesson.lessons_number}}
+
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <th>Дата</th>
+
+                        <td>
+
+                            <span class="" >
+
+                                {{lesson.date|date:"d.m.Y"}}
+
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <th>Вид занятия</th>
+
+                        <td>
+
+                            <span class="">
+
+                                {{lesson.get_type_employment_display}}
+
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <th>Тема</th>
+
+                        <td>
+
+                            <span>
+
+                                {{lesson.theme}}
+
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <th>Посещение</th>
+
+                        <td>
+
+                            <span>
+
+                                {{attendance.get_grade_display }}
+
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                            <th>Отправить комментарий</th>
+
+                            <td>
+
+                                {% for f in form_comment.visible_fields %}
+                                
+                                    {{f}}
+
+                                {% endfor %}
+
+                                {% for field in form_file.visible_fields %}
+                                
+                                    {{field}}
+
+                                    <label for="id_file_form-file">
+
+                                        <span>
+                                            
+                                            Загрузить файл
+
+                                        </span>	
+
+                                    </label>
+                                
+                                {% endfor %}
+
+                            </td>
+
+                        </tr>
+
+                        <tr>
+
+                            <th>История комментариев</th>
+
+                            <td>
+
+                                {% for comment in attendance.comments.all %}
+
+                                    <div class="chat_item">
+
+                                        <div class="chat_author">
+
+                                            {% if comment.author == user %}
+
+                                                Вы:
+                                                
+                                            {% else %}
+                                                
+                                                {{comment.author.get_full_name_initials}}:
+                                                
+                                            {% endif %}
+
+                                            <span class="chat_datetime">
+
+                                                {{comment.pub_date|date:"d.m.Y H:i"}}
+
+                                            </span>
+
+                                        </div>
+
+                                        {{comment}}
+
+                                        {% for file in comment.files.all %}
+
+                                            <a href="{% url 'mainapp_download_file_url' file.file.path %}" download>
+                                            
+                                                {% with file|get_expansion as file_expansion %}
+                    
+                                                    <img class="comment_image" src="{% static 'img/'|add:file_expansion|add:'.png' %}">
+                                                
+                                                {% endwith %}
+
+                                                <div class="comment_postimage_text">
+
+                                                    {{file}}
+
+                                                </div>  
+                                            
+                                            </a>
+                                        
+                                        {% endfor %}
+
+                                    </div>
+
+                                {% empty %}
+
+                                    -
+                                
+                                {% endfor %}
+
+                            </td>
+
+                        </tr>
+                
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <div class="row_div flex_div flex_div_vertical">
+                
+            <button type="submit" name="comment_submit" class="btn sircle_btn little_button">Отправить комментарий</button>
+
+        </div>
+
+    </form>
+
+{% endblock content %}
+
+{% block javascript %}
+
+    <!-- Import script toggle button -->
+
+	<script type="text/javascript" src="{% static 'js/toggle_button.js' %}"></script>
+
+    <!-- Import script close message -->
+
+	<script type="text/javascript" src="{% static 'js/close_message.js' %}"></script>
+
+    <!-- Import script toggle button -->
+
+	<script type="text/javascript" src="{% static 'js/multiple_file.js' %}"></script>
+
+{% endblock javascript %}

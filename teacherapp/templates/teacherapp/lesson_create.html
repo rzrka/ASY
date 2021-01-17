@@ -1,0 +1,61 @@
+{% extends 'teacherapp/lesson_list.html' %}
+
+{% load static %}
+
+{% load django_bootstrap_breadcrumbs %}
+
+{% block breadcrumbs %}
+
+	{{ block.super }}
+
+	{% breadcrumb "Новое занятие" 'teacherapp_lesson_create_url' %}
+
+{% endblock %}
+
+{% block content %}
+
+    <div class="row_div">
+
+        <div class="document_title">
+            
+            <h3>
+                
+                Информация о занятии:
+
+            </h3>
+
+        </div>
+
+    </div>
+
+    {% include 'teacherapp/includes/form-messages_errors.html' %}
+
+    <form method="post" action="{% url 'teacherapp_lesson_create_url' schedule.id %}">
+
+        {% include 'teacherapp/includes/form-table.html' %}
+
+        {% block attendance_block %}
+
+        {% endblock attendance_block %}
+
+        <div class="row_div flex_div flex_div_vertical">
+            
+            <button type="submit" class="btn sircle_btn little_button">Сохранить данные</button>
+
+        </div>
+
+    </form>
+
+{% endblock content %}
+
+{% block javascript %}
+
+    <!-- Import script toggle button -->
+
+	<script type="text/javascript" src="{% static 'js/toggle_button.js' %}"></script>
+
+    <!-- Import script close message -->
+
+	<script type="text/javascript" src="{% static 'js/close_message.js' %}"></script>
+
+{% endblock javascript %}

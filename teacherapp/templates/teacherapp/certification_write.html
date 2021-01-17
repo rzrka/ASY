@@ -1,0 +1,308 @@
+{% extends 'teacherapp/certification_list.html' %}
+
+{% load static %}
+
+{% load django_bootstrap_breadcrumbs %}
+
+{% block style %}
+
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+    <script type="text/javascript" src="{% static 'js/jquery.table2excel.js' %}"></script>
+
+    <link rel="stylesheet" type="text/css" href="{% static 'css/svg_schedule.css' %}">
+
+    <link rel="stylesheet" type="text/css" href="{% static 'css/table_button.css' %}">
+
+{% endblock style %}
+
+{% block breadcrumbs %}
+
+	{{ block.super }}
+
+	{% with certification.number|stringformat:"i" as name %}
+
+        {% breadcrumb "Аттестация №"|add:name 'teacherapp_certification_write_url' schedule.id certification.id %}
+
+    {% endwith %}
+
+{% endblock %}
+
+{% load teacherapp_extras %}
+
+{% block content %}
+
+    <div class="row_div">
+
+		<div class="document_title">
+
+			<h3>
+
+                {{certification.name|truncatewords:"15"}}
+
+			</h3>
+        
+        </div>
+
+    </div>
+
+    {% include 'teacherapp/includes/form-messages_errors.html' %}
+
+    <form method="post" action="{% url 'teacherapp_certification_write_url' schedule.id certification.id %}">
+
+        {% csrf_token %}
+
+        <div class="row_div table_div flex_div">
+
+            <table class="table-hover table-striped table-bordered flex-table grades_table" data-table_name="{{certification.name|truncatewords:"15"}}">
+
+                {% with schedule.control_types.all|dictsort:'name' as control_types %}
+
+                    <thead>
+                        
+                            <tr>
+
+                                <th scope="col" width="80" rowspan="2">№</th>
+
+                                <th scope="col" rowspan="2">Студенты</th>
+
+                                {% for control_type in control_types %}
+
+                                    {% if control_type.control_works.all.count != 0  %}
+
+                                        <th scope="col" colspan="{{control_type.control_works.all.count}}">
+                                        
+                                            {{control_type.name}}
+                                        
+                                        </th>
+                                    
+                                    {% endif %}
+                                
+                                {% endfor %}
+
+                                <th scope="col" rowspan="2">Оценка за аттестацию</th>
+
+                                <th scope="col" rowspan="2">Рекомендовано</th>
+
+                            </tr>
+
+                            <tr>
+
+                                {% for control_type in control_types %}
+
+                                    {% for control_job in control_type.control_works.all|dictsort:'work_number' %}
+                                    
+                                        <th scope="col">
+                                    
+                                            <a href="{% url 'teacherapp_job_write_url' schedule.id control_type.id control_job.id %}">
+                                            
+                                                №{{control_job.work_number}}
+                                            
+                                            </a>
+                                        
+                                        </th>
+                                    
+                                    {% endfor %}
+
+                                {% endfor %}
+
+                            </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for student in schedule.studentgroup.students.all|dictsort:"version_in_group"  %}
+
+                            <tr>
+
+                                <th>{{student.version_in_group}}</th>
+
+                                <td>{{student.student.get_full_name}}</td>
+
+                                {% with jobs_elements|get_item:student.id as grades %}
+
+                                    {% for control_type in control_types %}
+
+                                        {% for control_job in control_type.control_works.all|dictsort:'work_number' %}
+
+                                            {% with grades|get_grade_from_query:control_job as grade %}
+
+                                                <td {% if not certification.id|is_certification_work:grade.controlwork.id %}class="no_chosed_certification"{% endif %}>
+
+                                                    {% if grade.controlwork.scale.dimension == 5 %}
+
+                                                        <div class="svg_hourglass_relative" data-category="{{grade}}">
+                                                        
+                                                            {{grade}}
+                                                    
+                                                    {% elif grade.controlwork.scale.dimension == 2 %}
+
+                                                        <div class="svg_hourglass_relative" data-category="{{grade|grade_attendance_offset_grade}}">
+
+                                                            {{grade|grade_attendance_offset}}
+                                                    
+                                                    {% else %}
+
+                                                        <div class="half_span_relative svg_hourglass_relative" data-category="{{grade|get_normal_grade}}">
+
+                                                            <span class="half_span">
+
+                                                                {{grade}}
+                                                            
+                                                                    {% if grade.controlwork.scale.dimension == 100 %}
+                                                                
+                                                                    %
+                                                                        
+                                                                {% else %}
+                                                            
+                                                                    / 
+                                                                
+                                                                    {{grade.controlwork.scale.dimension}}
+                                                            
+                                                                {% endif %}  
+
+                                                            </span>
+
+                                                            <span class="half_span">
+
+                                                                {{grade|get_normal_grade}}
+
+                                                            </span>
+
+                                                    {% endif %}
+
+                                                    {% with grade|unchecked_works as works %}
+                                                
+                                                        {% if works %}
+                                                    
+                                                            <img
+                                                                class="svg_hourglass"
+                                                                src="{% static 'svg/hourglass_empty-black-18dp.svg' %}"
+                                                                alt="hourglass">
+                                                        
+                                                        {% endif %}
+                                                    
+                                                    {% endwith %}
+
+                                                    </div>
+
+                                                </td>
+
+                                            {% endwith %}
+
+                                        {% endfor %}
+
+                                    {% endfor %}
+
+                                {% endwith %}
+
+                                <td class="color_numberinput_grade" data-scale="100">
+
+                                    {% for field in grades|get_item:student.id %}
+                                    
+                                        {{field}}
+                                    
+                                    {% endfor %}
+
+                                </td>
+
+                                <th>
+
+                                    {% with recomended_grades|get_item:student.id as recomended %}
+
+                                        <div class="" data-category="{% if certification.scale_translate %}{{recomended|get_normal_grade_certification:certification}}{% else %}{{recomended}}{% endif %}">
+
+                                            {{recomended}}
+
+                                            {% if certification.scale_translate %}
+
+                                                ({{recomended|get_normal_grade_certification:certification}})
+                                            
+                                            {% endif %}
+
+                                        </div>
+                                    
+                                    {% endwith %}
+
+                                </th>
+                                
+                            </tr>
+                        
+                        {% empty %}
+                        
+                            <td colspan="2">Список студентов пуст!</td>
+                        
+                        {% endfor %}
+
+                    </tbody>
+
+                {% endwith %}
+
+            </table>
+
+        </div>
+
+        <div class="row_div flex_div flex_div_vertical">
+
+            {% comment %} <button type="submit" class="btn sircle_btn little_button">Сохранить данные</button> {% endcomment %}
+
+            <button type="submit" name="write_certification" class="btn sircle_btn little_button">Выставить аттестацию студентам</button>
+
+        </div>
+        
+    </form>
+
+{% endblock content %}
+
+{% block javascript %}
+
+    <!-- Import script close message -->
+
+	<script type="text/javascript" src="{% static 'js/close_message.js' %}"></script>
+
+    <!-- Import table scripts -->
+
+	<script type="text/javascript" src="{% static 'js/show_href_blocks.js' %}"></script>
+
+    <!-- Import script close message -->
+
+	<script type="text/javascript" src="{% static 'js/close_message.js' %}"></script>
+
+    <script type="text/javascript">
+        var general_classes = null;
+    </script>
+
+    <!-- Import script toggle button -->
+
+	<script type="text/javascript" src="{% static 'js/toggle_button.js' %}"></script>
+
+    <!-- Import color input script -->
+
+	<script type="text/javascript" src="{% static 'js/color_numberinputs.js' %}"></script>
+   
+    <script type="text/javascript">
+        $('.color_numberinput_grade').each(function() {
+            $(this).find('input[type="number"]').on('change', function() {
+                set_numberimputs_color();
+            });
+        });
+        set_numberimputs_color();
+    </script>
+
+    	<!-- Import script table buttons -->
+
+	<script type="text/javascript">
+		var img_path = "{% static 'png/widen.png' %}";
+		var close_img_path = "{% static 'png/decrease.png' %}";
+        var excel_img_path = "{% static 'png/excel-export.png' %}";
+		var resize_function = null;
+	</script>
+
+	<!-- Import table scripts -->
+
+	<script type="text/javascript" src="{% static 'js/big_table.js' %}"></script>
+
+	<script type="text/javascript" src="{% static 'js/table_button.js' %}"></script>
+
+{% endblock javascript %}
